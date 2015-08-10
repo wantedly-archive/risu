@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Usage: script/install-compose
+# Description: Install Docker Compose
+#
+
+set -e
+
+# On wercker, docker version is still v1.2
+# Compose v1.2.0 isn't compatible with docker 1.2,
+# so we use compose 1.1.0 for now.
+COMPOSE_VERSION=1.1.0
+
+if [[ -f /opt/bin/compose && $(compose --version) =~ $COMPOSE_VERSION ]]
+then
+  echo "  + Compose $COMPOSE_VERSION found"
+else
+  echo "  x Compose not found"
+  echo "    Installing compose $COMPOSE_VERSION..."
+
+  if [[ ! -d /opt/bin ]]
+  then
+    echo "  + Creating /opt/bin..."
+    sudo mkdir -pv /opt/bin
+  fi
+
+  curl -L https://github.com/docker/compose/releases/download/$COMPOSE_VERSION/docker-compose-`uname -s`-`uname -m` \
+    > /tmp/compose
+  sudo mv /tmp/compose /opt/bin/compose
+  chmod +x /opt/bin/compose
+  echo "  + Installed"
+fi
