@@ -1,4 +1,4 @@
-package main
+package cache
 
 import (
 	"archive/tar"
@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func deflateTarGz(tarGzPath, deflateDir string) {
+func DeflateTarGz(tarGzPath, deflateDir string) {
 	tarFile, err := os.Create(tarGzPath)
 
 	if err != nil {
@@ -28,7 +28,7 @@ func deflateTarGz(tarGzPath, deflateDir string) {
 	walkDir(deflateDir, tarGzWriter)
 }
 
-func inflateTarGz(tarGzPath, inflateDir string) {
+func InflateTarGz(tarGzPath, inflateDir string) {
 	file, err := os.Open(tarGzPath)
 
 	if err != nil {
