@@ -45,7 +45,7 @@
           ]
         },
         "name": {
-          "description": "a source_repository name (and optionally a tag) to apply to the resulting image in case of success.",
+          "description": "a repository name (and optionally a tag) to apply to the resulting image in case of success.",
           "example": "quay.io/wantedly/risu:latest",
           "type": [
             "string"
