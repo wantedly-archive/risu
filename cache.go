@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func deflateTarGz(deflateDir, tarGzPath string) {
+func deflateTarGz(tarGzPath, deflateDir string) {
 	tarFile, err := os.Create(tarGzPath)
 
 	if err != nil {
@@ -29,7 +29,7 @@ func deflateTarGz(deflateDir, tarGzPath string) {
 	walkDir(deflateDir, tarGzWriter)
 }
 
-func inflateTarGz(tarGzPath, outDir string) {
+func inflateTarGz(tarGzPath, inflateDir string) {
 	file, err := os.Open(tarGzPath)
 
 	if err != nil {
@@ -60,7 +60,7 @@ func inflateTarGz(tarGzPath, outDir string) {
 		}
 
 		buffer := new(bytes.Buffer)
-		outPath := outDir + "/" + header.Name
+		outPath := inflateDir + "/" + header.Name
 
 		switch header.Typeflag {
 		case tar.TypeDir:
