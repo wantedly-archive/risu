@@ -1,0 +1,8 @@
+---
+"$schema": http://json-schema.org/draft-04/hyper-schema
+description: Risu API v1 Alpha Document
+id: risu
+links:
+- href: https://<your-risu-server>.com/
+  rel: self
+  title: Risu API v1 Alpha
