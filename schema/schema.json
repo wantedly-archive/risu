@@ -159,7 +159,7 @@
   "id": "risu",
   "links": [
     {
-      "href": "https://<your-risu-server>.com/",
+      "href": "https://<your-risu-server>.com",
       "rel": "self",
       "title": "Risu API v1 Alpha"
     }

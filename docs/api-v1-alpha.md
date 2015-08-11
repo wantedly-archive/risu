@@ -1,3 +1,5 @@
+# Risu API v1 Alpha
+
 ## <a name="resource-build"></a>Build
 
 A build represents an individual build job for docker image
@@ -36,7 +38,7 @@ POST /builds
 #### Curl Example
 
 ```bash
-$ curl -n -X POST https://<your-risu-server>.com//builds \
+$ curl -n -X POST https://<your-risu-server>.com/builds \
   -H "Content-Type: application/json" \
  \
   -d '{
@@ -79,7 +81,7 @@ GET /builds/{build_id}
 #### Curl Example
 
 ```bash
-$ curl -n https://<your-risu-server>.com//builds/$BUILD_ID
+$ curl -n https://<your-risu-server>.com/builds/$BUILD_ID
 ```
 
 
@@ -114,7 +116,7 @@ GET /builds
 #### Curl Example
 
 ```bash
-$ curl -n https://<your-risu-server>.com//builds
+$ curl -n https://<your-risu-server>.com/builds
 ```
 
 
