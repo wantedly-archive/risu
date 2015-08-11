@@ -4,9 +4,9 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
-	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -15,8 +15,7 @@ func deflateTarGz(tarGzPath, deflateDir string) {
 	tarFile, err := os.Create(tarGzPath)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	defer tarFile.Close()
 
@@ -33,16 +32,14 @@ func inflateTarGz(tarGzPath, inflateDir string) {
 	file, err := os.Open(tarGzPath)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
 	gzfile, err := gzip.NewReader(file)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	reader := tar.NewReader(gzfile)
@@ -55,8 +52,7 @@ func inflateTarGz(tarGzPath, inflateDir string) {
 		}
 
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		buffer := new(bytes.Buffer)
@@ -70,13 +66,11 @@ func inflateTarGz(tarGzPath, inflateDir string) {
 
 		case tar.TypeReg:
 			if _, err = io.Copy(buffer, reader); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 
 			if err = ioutil.WriteFile(header.Name, buffer.Bytes(), 0755); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				log.Fatal(err)
 			}
 		}
 	}
@@ -86,16 +80,14 @@ func walkDir(baseDir string, tarGzWriter *tar.Writer) {
 	dir, err := os.Open(baseDir)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	defer dir.Close()
 
 	files, err := dir.Readdir(0)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	for _, fileInfo := range files {
@@ -113,8 +105,7 @@ func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) 
 	file, err := os.Open(filePath)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	defer file.Close()
 
@@ -127,14 +118,12 @@ func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) 
 	err = tarGzWriter.WriteHeader(header)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	_, err = io.Copy(tarGzWriter, file)
 
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
