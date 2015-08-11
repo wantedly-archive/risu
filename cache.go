@@ -99,7 +99,6 @@ func walkDir(baseDir string, tarGzWriter *tar.Writer) {
 	}
 
 	for _, fileInfo := range files {
-		fmt.Println(fileInfo.Name())
 		filePath := dir.Name() + string(filepath.Separator) + fileInfo.Name()
 
 		if fileInfo.IsDir() {
