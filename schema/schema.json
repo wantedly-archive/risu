@@ -32,6 +32,7 @@
         },
         "source_repo": {
           "description": "source github source_repositry to build. It must includes Dockerfile",
+          "required": "true,",
           "example": "wantedly/risu",
           "type": [
             "string"
@@ -39,6 +40,7 @@
         },
         "source_revision": {
           "description": "git revision to use for build. (also you can use git tag/branch for this).",
+          "required": "true,",
           "example": "ada9ce1829fab49e605e5a563dbf91274f64e923",
           "type": [
             "string"
@@ -46,6 +48,7 @@
         },
         "name": {
           "description": "a repository name (and optionally a tag) to apply to the resulting image in case of success.",
+          "required": "true,",
           "example": "quay.io/wantedly/risu:latest",
           "type": [
             "string"
@@ -54,19 +57,22 @@
         "dockerfile": {
           "description": "path within the build context to the Dockerfile",
           "example": "Dockerfile.dev",
+          "default": "Dockerfile",
           "type": [
             "string"
           ]
         },
         "status": {
           "description": "status of build. one of \"failed\" or \"building\" or \"succeeded\"",
-          "example": "failed",
+          "readOnly": true,
+          "example": "succeeded",
           "type": [
             "string"
           ]
         },
         "created_at": {
           "description": "when build was created",
+          "readOnly": true,
           "format": "date-time",
           "type": [
             "string"
@@ -74,6 +80,7 @@
         },
         "updated_at": {
           "description": "when build was updated",
+          "readOnly": true,
           "format": "date-time",
           "type": [
             "string"
