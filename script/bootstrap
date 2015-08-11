@@ -14,6 +14,17 @@ echo "  CoreOS Sandbox"
 echo ""
 
 #
+# Prepare .env
+#
+if test -f .env
+then
+  echo "  + .env found"
+else
+  echo "  + Creating .env"
+  cp .env.sample .env
+fi
+
+#
 # Prepare coreos/.env
 #
 if test -f coreos/.env
