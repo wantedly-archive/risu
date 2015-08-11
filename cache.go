@@ -8,7 +8,26 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
+
+func deflateTarGz(deflateDir, tarGzPath string) {
+	tarFile, err := os.Create(tarGzPath)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer tarFile.Close()
+
+	gzipWriter := gzip.NewWriter(tarFile)
+	defer gzipWriter.Close()
+
+	tarGzWriter := tar.NewWriter(gzipWriter)
+	defer tarGzWriter.Close()
+
+	walkDir(deflateDir, tarGzWriter)
+}
 
 func inflateTarGz(tarGzPath, outDir string) {
 	file, err := os.Open(tarGzPath)
@@ -60,5 +79,63 @@ func inflateTarGz(tarGzPath, outDir string) {
 				os.Exit(1)
 			}
 		}
+	}
+}
+
+func walkDir(baseDir string, tarGzWriter *tar.Writer) {
+	dir, err := os.Open(baseDir)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer dir.Close()
+
+	files, err := dir.Readdir(0)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	for _, fileInfo := range files {
+		fmt.Println(fileInfo.Name())
+		filePath := dir.Name() + string(filepath.Separator) + fileInfo.Name()
+
+		if fileInfo.IsDir() {
+			walkDir(filePath, tarGzWriter)
+		} else {
+			writeTarGz(filePath, tarGzWriter, fileInfo)
+		}
+	}
+}
+
+func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) {
+	file, err := os.Open(filePath)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	header := new(tar.Header)
+	header.Name = filePath
+	header.Size = fileInfo.Size()
+	header.Mode = int64(fileInfo.Mode())
+	header.ModTime = fileInfo.ModTime()
+
+	err = tarGzWriter.WriteHeader(header)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	_, err = io.Copy(tarGzWriter, file)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
