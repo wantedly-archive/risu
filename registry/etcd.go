@@ -1,6 +1,12 @@
 package registry
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path"
+	"strings"
+
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/coreos/go-etcd/etcd"
 
@@ -17,7 +23,7 @@ type EtcdRegistry struct {
 	keyPrefix string
 }
 
-func NewRegistry(machines string, keyPrefix string) *Registry {
+func NewEtcdRegistry(machines string) Registry {
 	if os.Getenv("RISU_ETCD_MACHINES") != "" {
 		machines = os.Getenv("RISU_ETCD_MACHINES")
 	}
@@ -28,15 +34,42 @@ func NewRegistry(machines string, keyPrefix string) *Registry {
 
 	m := strings.Split(machines, ",")
 	etcdClient := *etcd.NewClient(m)
-	return &Registry{etcdClient, keyPrefix}
+	return &EtcdRegistry{etcdClient, DefaultKeyPrefix}
 }
 
-func (r *EtcdRegistry) Set(id uuid.UUID, build schema.Build) error {
+func (r *EtcdRegistry) Set(build schema.Build) error {
+	j, err := marshal(build)
+	if err != nil {
+		return err
+	}
+
+	key := path.Join(r.keyPrefix, build.ID.String())
+	_, err = r.etcd.Set(key, string(j), 0)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (r *EtcdRegistry) Get(id uuid.UUID) (schema.Build, error) {
-	return nil
+	key := path.Join(r.keyPrefix, id.String())
+	res, err := r.etcd.Get(key, false, true)
+	if err != nil {
+		return schema.Build{}, err
+	}
+
+	var build schema.Build
+	err = unmarshal(res.Node.Value, &build)
+	if err != nil {
+		if isKeyNotFound(err) {
+			// TODO (spesnova): return 404 error
+			return schema.Build{}, err
+		}
+		return schema.Build{}, err
+	}
+
+	return build, nil
 }
 
 func marshal(obj interface{}) (string, error) {

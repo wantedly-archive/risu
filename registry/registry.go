@@ -6,6 +6,15 @@ import (
 )
 
 type Registry interface {
-	Set(id uuid.UUID, build schema.Build) error
+	Set(build schema.Build) error
 	Get(id uuid.UUID) (schema.Build, error)
+}
+
+func NewRegistry(backend string, endpoint string) Registry {
+	switch backend {
+	case "etcd":
+		return NewEtcdRegistry(endpoint)
+	default:
+		return NewEtcdRegistry(endpoint)
+	}
 }
