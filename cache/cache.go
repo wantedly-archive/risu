@@ -11,6 +11,17 @@ import (
 )
 
 type Cache interface {
+	Get(key string) (string, error)
+	Put(key, directory string) error
+}
+
+func NewCache(backend string) Cache {
+	switch backend {
+	case "local":
+		return NewLocalFsCache()
+	default:
+		return NewLocalFsCache()
+	}
 }
 
 func DeflateTarGz(tarGzPath, deflateDir string) error {
