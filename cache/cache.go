@@ -6,7 +6,6 @@ import (
 	"compress/gzip"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -14,11 +13,11 @@ import (
 type Cache interface {
 }
 
-func DeflateTarGz(tarGzPath, deflateDir string) {
+func DeflateTarGz(tarGzPath, deflateDir string) error {
 	tarFile, err := os.Create(tarGzPath)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer tarFile.Close()
 
@@ -29,20 +28,22 @@ func DeflateTarGz(tarGzPath, deflateDir string) {
 	defer tarGzWriter.Close()
 
 	walkDir(deflateDir, tarGzWriter)
+
+	return nil
 }
 
-func InflateTarGz(tarGzPath, inflateDir string) {
+func InflateTarGz(tarGzPath, inflateDir string) error {
 	file, err := os.Open(tarGzPath)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 
 	gzfile, err := gzip.NewReader(file)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	reader := tar.NewReader(gzfile)
@@ -55,7 +56,7 @@ func InflateTarGz(tarGzPath, inflateDir string) {
 		}
 
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		buffer := new(bytes.Buffer)
@@ -69,28 +70,30 @@ func InflateTarGz(tarGzPath, inflateDir string) {
 
 		case tar.TypeReg:
 			if _, err = io.Copy(buffer, reader); err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			if err = ioutil.WriteFile(header.Name, buffer.Bytes(), 0755); err != nil {
-				log.Fatal(err)
+				return err
 			}
 		}
 	}
+
+	return nil
 }
 
-func walkDir(baseDir string, tarGzWriter *tar.Writer) {
+func walkDir(baseDir string, tarGzWriter *tar.Writer) error {
 	dir, err := os.Open(baseDir)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer dir.Close()
 
 	files, err := dir.Readdir(0)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	for _, fileInfo := range files {
@@ -102,13 +105,15 @@ func walkDir(baseDir string, tarGzWriter *tar.Writer) {
 			writeTarGz(filePath, tarGzWriter, fileInfo)
 		}
 	}
+
+	return nil
 }
 
-func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) {
+func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) error {
 	file, err := os.Open(filePath)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 
@@ -121,12 +126,14 @@ func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) 
 	err = tarGzWriter.WriteHeader(header)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, err = io.Copy(tarGzWriter, file)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
