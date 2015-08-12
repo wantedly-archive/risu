@@ -1,12 +1,43 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"time"
 
+	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+
+	"github.com/wantedly/risu/schema"
 )
+
+func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	defer r.Body.Close()
+	var opts schema.BuildCreateOpts
+	err := json.NewDecoder(r.Body).Decode(&opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if opts.Dockerfile == "" {
+		opts.Dockerfile = "Dockerfile"
+	}
+
+	build := schema.Build{
+		ID:             uuid.NewUUID(),
+		SourceRepo:     opts.SourceRepo,
+		SourceRevision: opts.SourceRevision,
+		Name:           opts.Name,
+		Dockerfile:     opts.Dockerfile,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
+
+	fmt.Fprint(w, build)
+}
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	name := r.FormValue("name")
@@ -21,7 +52,8 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func main() {
 	router := httprouter.New()
 	router.GET("/", index)
-	router.GET("/build/:image", show)
+	router.GET("/builds/:image", show)
+	router.POST("/builds", create)
 
 	n := negroni.Classic()
 	n.UseHandler(router)
