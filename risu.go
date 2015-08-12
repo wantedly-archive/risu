@@ -8,19 +8,12 @@ import (
 
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+	"github.com/wantedly/risu/schema"
 )
-
-// Build is "Create a new build.""
-type Build struct {
-	SourceRepo     string `json:"source_repo"`
-	SourceRevision string `json:"source_revision"`
-	Name           string `json:"name"`
-	Dockerfile     string `json:"dockerfile"`
-}
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
-	build := &Build{Dockerfile: "Dockerfile"} // default setup Dockerfile
+	build := &schema.Build{Dockerfile: "Dockerfile"} // default setup Dockerfile
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&build)
 	if err != nil {
