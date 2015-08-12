@@ -11,6 +11,9 @@ import (
 	"path/filepath"
 )
 
+type Cache interface {
+}
+
 func DeflateTarGz(tarGzPath, deflateDir string) {
 	tarFile, err := os.Create(tarGzPath)
 
