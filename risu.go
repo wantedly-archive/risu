@@ -5,22 +5,38 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+
 	"github.com/wantedly/risu/schema"
 )
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
-	build := &schema.Build{Dockerfile: "Dockerfile"} // default setup Dockerfile
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&build)
+	var opts schema.BuildCreateOpts
+	err := json.NewDecoder(r.Body).Decode(&opts)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Fprintln(w, build)
+	if opts.Dockerfile == "" {
+		opts.Dockerfile = "Dockerfile"
+	}
+
+	build := schema.Build{
+		ID:             uuid.NewUUID(),
+		SourceRepo:     opts.SourceRepo,
+		SourceRevision: opts.SourceRevision,
+		Name:           opts.Name,
+		Dockerfile:     opts.Dockerfile,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
+
+	fmt.Fprint(w, build)
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
