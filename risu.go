@@ -1,30 +1,29 @@
 package main
 
 import (
-	"code.google.com/p/go-uuid/uuid"
+	"fmt"
+	"net/http"
 
-	"github.com/wantedly/risu/registry"
-	"github.com/wantedly/risu/schema"
+	"github.com/codegangsta/negroni"
+	"github.com/julienschmidt/httprouter"
 )
 
+func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	name := r.FormValue("name")
+	fmt.Fprintf(w, "Welcome, %s!\n", name)
+}
+
+func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	image := ps.ByName("image")
+	fmt.Fprintf(w, "Build %s!\n", image)
+}
+
 func main() {
-	reg := registry.NewRegistry("etcd", "http://172.17.8.101:4001")
+	router := httprouter.New()
+	router.GET("/", index)
+	router.GET("/build/:image", show)
 
-	build := schema.Build{
-		ID:             uuid.NewUUID(),
-		SourceRepo:     "wantedly/risu",
-		SourceRevision: "2c004f60b47bac66a3a83ffe40b822629251c037",
-		Name:           "quay.io/wantedly/risu:latest",
-		Dockerfile:     "Dockerfile",
-	}
-
-	err := reg.Set(build)
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = reg.Get(build.ID)
-	if err != nil {
-		panic(err)
-	}
+	n := negroni.Classic()
+	n.UseHandler(router)
+	n.Run(":8080")
 }
