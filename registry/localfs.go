@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"code.google.com/p/go-uuid/uuid"
+
 	"github.com/wantedly/risu/schema"
 )
 
