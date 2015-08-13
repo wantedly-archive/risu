@@ -9,15 +9,15 @@ import (
 	"github.com/wantedly/risu/schema"
 )
 
-// DefaultFilePath : default file path
+// DefaultFilePath is default file path
 const DefaultFilePath = "/tmp/risu/"
 
-// LocalFsRegistry : sharing path
+// LocalFsRegistry is sharing path
 type LocalFsRegistry struct {
 	path string
 }
 
-// NewLocalFsRegistry : init
+// NewLocalFsRegistry is init
 func NewLocalFsRegistry(path string) Registry {
 	if path == "" {
 		path = DefaultFilePath
@@ -29,7 +29,7 @@ func NewLocalFsRegistry(path string) Registry {
 	return &LocalFsRegistry{path}
 }
 
-// Set : Stores the build data to a json file. file name is "/tmp/risu/<UUID>.json".
+// Set stores the build data to a json file. file name is "/tmp/risu/<UUID>.json".
 func (r *LocalFsRegistry) Set(build schema.Build) error {
 	b, err := json.Marshal(build)
 	if err != nil {
@@ -52,7 +52,7 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 	return nil
 }
 
-// Get : get build data
+// Get get build data
 func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
 	// TODO: add error handling.(Expired Data and Not Found File)
 	file, err := os.Open(r.path + id.String() + ".json")
