@@ -19,7 +19,10 @@ const (
 )
 
 func NewS3Cache() Cache {
-	// TODO: raise error if AWS credentials are not set
+	if os.Getenv("AWS_ACCESS_KEY_ID") == "" || os.Getenv("AWS_SECRET_ACCESS_KEY") == "" {
+		// TODO: raise error if AWS credentials are not set
+		return nil
+	}
 
 	s3Client := s3.New(nil)
 
