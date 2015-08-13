@@ -40,8 +40,9 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	reg := registry.NewRegistry("localfs", "")
 	reg.Set(build)
 
-	getBuildData, err := reg.Get(build.ID)
-	fmt.Fprintln(w, getBuildData)
+	// debug code
+	builddata, err := reg.Get(build.ID)
+	fmt.Fprintln(w, builddata)
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
