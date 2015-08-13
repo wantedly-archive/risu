@@ -19,6 +19,8 @@ func NewCache(backend string) Cache {
 	switch backend {
 	case "local":
 		return NewLocalFsCache()
+	case "s3":
+		return NewS3Cache()
 	default:
 		return NewLocalFsCache()
 	}
