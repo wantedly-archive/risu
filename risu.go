@@ -10,10 +10,13 @@ import (
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
 )
+
+var ren = render.New()
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
@@ -46,7 +49,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprintln(w, "Status OK")
+	ren.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -60,9 +63,9 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	reg := registry.NewRegistry("localfs", "")
 	build, err := reg.Get(uuid)
 	if err != nil {
-		fmt.Fprintln(w, "Not Found") // FIXME
+		ren.JSON(w, http.StatusNotFound, map[string]string{"status": "not found"})
 	}
-	fmt.Fprintf(w, "Build %s!\n", build)
+	ren.JSON(w, http.StatusOK, build)
 }
 
 func main() {
