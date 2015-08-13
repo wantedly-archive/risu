@@ -39,7 +39,7 @@ func (c *LocalFsCache) Get(key string) (string, error) {
 		return "", nil
 	}
 
-	if err = InflateTarGz(cache, inflateDir); err != nil {
+	if err := InflateTarGz(cache, inflateDir); err != nil {
 		return "", err
 	}
 
