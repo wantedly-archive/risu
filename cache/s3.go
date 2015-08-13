@@ -32,7 +32,15 @@ func NewS3Cache() Cache {
 		cacheBucket = os.Getenv("RISU_CACHE_BUCKET")
 	}
 
-	// TODO: raise error if bucket not found
+	_, err := s3Client.HeadBucket(
+		&s3.HeadBucketInput{
+			Bucket: aws.String(cacheBucket),
+		})
+
+	if err != nil {
+		// TODO: raise error if bucket not found
+		return nil
+	}
 
 	return &S3Cache{cacheBucket, s3Client}
 }
