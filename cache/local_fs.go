@@ -32,9 +32,14 @@ func NewLocalFsCache() Cache {
 }
 
 func (c *LocalFsCache) Get(key string) (string, error) {
+	cache := cachePath(key)
 	inflateDir := inflateDirPath(key)
 
-	if err := InflateTarGz(cachePath(key), inflateDir); err != nil {
+	if _, err := os.Stat(cache); err != nil {
+		return "", nil
+	}
+
+	if err = InflateTarGz(cache, inflateDir); err != nil {
 		return "", err
 	}
 
