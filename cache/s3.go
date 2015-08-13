@@ -26,11 +26,12 @@ func NewS3Cache() Cache {
 
 	s3Client := s3.New(nil)
 
-	var cacheBucket string
-
-	if os.Getenv("RISU_CACHE_BUCKET") != "" {
-		cacheBucket = os.Getenv("RISU_CACHE_BUCKET")
+	if os.Getenv("RISU_CACHE_BUCKET") == "" {
+		// TODO: raise error if RISU_CACHE_BUCKET is not set
+		return nil
 	}
+
+	cacheBucket := os.Getenv("RISU_CACHE_BUCKET")
 
 	_, err := s3Client.HeadBucket(
 		&s3.HeadBucketInput{
