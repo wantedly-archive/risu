@@ -38,7 +38,13 @@ func DeflateTarGz(tarGzPath, deflateDir string) error {
 	tarGzWriter := tar.NewWriter(gzipWriter)
 	defer tarGzWriter.Close()
 
-	walkDir(deflateDir, tarGzWriter)
+	deflateDir, err = filepath.Abs(deflateDir)
+
+	if err != nil {
+		return err
+	}
+
+	walkDir(deflateDir, deflateDir, tarGzWriter)
 
 	return nil
 }
@@ -93,8 +99,8 @@ func InflateTarGz(tarGzPath, inflateDir string) error {
 	return nil
 }
 
-func walkDir(baseDir string, tarGzWriter *tar.Writer) error {
-	dir, err := os.Open(baseDir)
+func walkDir(walkingDir, baseDir string, tarGzWriter *tar.Writer) error {
+	dir, err := os.Open(walkingDir)
 
 	if err != nil {
 		return err
@@ -111,16 +117,16 @@ func walkDir(baseDir string, tarGzWriter *tar.Writer) error {
 		filePath := dir.Name() + string(filepath.Separator) + fileInfo.Name()
 
 		if fileInfo.IsDir() {
-			walkDir(filePath, tarGzWriter)
+			walkDir(filePath, baseDir, tarGzWriter)
 		} else {
-			writeTarGz(filePath, tarGzWriter, fileInfo)
+			writeTarGz(filePath, baseDir, tarGzWriter, fileInfo)
 		}
 	}
 
 	return nil
 }
 
-func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) error {
+func writeTarGz(filePath, baseDir string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) error {
 	file, err := os.Open(filePath)
 
 	if err != nil {
@@ -128,8 +134,14 @@ func writeTarGz(filePath string, tarGzWriter *tar.Writer, fileInfo os.FileInfo) 
 	}
 	defer file.Close()
 
+	relativePath, err := filepath.Rel(baseDir, filePath)
+
+	if err != nil {
+		return err
+	}
+
 	header := new(tar.Header)
-	header.Name = filePath
+	header.Name = relativePath
 	header.Size = fileInfo.Size()
 	header.Mode = int64(fileInfo.Mode())
 	header.ModTime = fileInfo.ModTime()
