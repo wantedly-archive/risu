@@ -32,7 +32,13 @@ func NewLocalFsCache() Cache {
 }
 
 func (c *LocalFsCache) Get(key string) (string, error) {
-	return "", nil
+	inflateDir := inflateDirPath(key)
+
+	if err := InflateTarGz(cachePath(key), inflateDir); err != nil {
+		return "", err
+	}
+
+	return inflateDir, nil
 }
 
 func (c *LocalFsCache) Put(key, directory string) error {
@@ -45,4 +51,8 @@ func (c *LocalFsCache) Put(key, directory string) error {
 
 func cachePath(key string) string {
 	return DefaultCacheDir + string(filepath.Separator) + key + ".tar.gz"
+}
+
+func inflateDirPath(key string) string {
+	return DefaultCacheDir + string(filepath.Separator) + key
 }
