@@ -28,7 +28,7 @@ func NewLocalFsRegistry(path string) Registry {
 	return &LocalFsRegistry{path}
 }
 
-// Set : build meta data save. file name is "/tmp/risu/UUID.json".
+// Set : Stores the build data to a json file. file name is "/tmp/risu/<UUID>.json".
 func (r *LocalFsRegistry) Set(build schema.Build) error {
 	b, err := json.Marshal(build)
 	if err != nil {
