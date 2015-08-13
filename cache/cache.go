@@ -172,3 +172,11 @@ func writeTarGz(filePath, baseDir string, tarGzWriter *tar.Writer, fileInfo os.F
 
 	return nil
 }
+
+func cacheFilePath(cacheDir, key string) string {
+	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
+}
+
+func inflateDirPath(cacheDir, key string) string {
+	return cacheDir + string(filepath.Separator) + key
+}

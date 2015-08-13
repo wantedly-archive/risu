@@ -2,7 +2,6 @@ package cache
 
 import (
 	"os"
-	"path/filepath"
 )
 
 type LocalFsCache struct {
@@ -52,12 +51,4 @@ func (c *LocalFsCache) Put(key, directory string) error {
 	}
 
 	return nil
-}
-
-func cacheFilePath(cacheDir, key string) string {
-	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
-}
-
-func inflateDirPath(cacheDir, key string) string {
-	return cacheDir + string(filepath.Separator) + key
 }

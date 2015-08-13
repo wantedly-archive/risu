@@ -3,9 +3,9 @@ package cache
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
@@ -35,8 +35,8 @@ func NewS3Cache() Cache {
 }
 
 func (c *S3Cache) Get(key string) (string, error) {
-	cachePath := cacheObjectPath(c.cacheBucket, key)
-	inflateDir := inflateDirPath(key)
+	temporaryCache := cacheFilePath(DefaultCacheDir, key)
+	inflateDir := inflateDirPath(DefaultCacheDir, key)
 
 	_, err := c.s3Client.HeadObject(
 		&s3.HeadObjectInput{
@@ -67,22 +67,22 @@ func (c *S3Cache) Get(key string) (string, error) {
 	data, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if err = ioutil.WriteFile(temporaryCache, data, 0644); err != nil {
-		return err
+		return "", err
 	}
 
 	if err = InflateTarGz(temporaryCache, inflateDir); err != nil {
-		return err
+		return "", err
 	}
 
 	return inflateDir, nil
 }
 
 func (c *S3Cache) Put(key, directory string) error {
-	temporaryCache := temporaryCachePath(key)
+	temporaryCache := cacheFilePath(DefaultCacheDir, key)
 
 	if err := DeflateTarGz(temporaryCache, directory); err != nil {
 		return err
@@ -108,16 +108,4 @@ func (c *S3Cache) Put(key, directory string) error {
 	}
 
 	return nil
-}
-
-func cacheObjectPath(bucket, key string) string {
-	return "s3://" + bucket + "/" + key
-}
-
-func inflateDirPath(key string) string {
-	return TemporaryCacheDir + string(filepath.Separator) + key
-}
-
-func temporaryCachePath(key string) string {
-	return TemporaryCacheDir + string(filepath.Separator) + key + ".tar.gz"
 }
