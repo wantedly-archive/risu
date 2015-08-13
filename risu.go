@@ -10,10 +10,13 @@ import (
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
 )
+
+var ren = render.New()
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
@@ -33,6 +36,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		SourceRevision: opts.SourceRevision,
 		Name:           opts.Name,
 		Dockerfile:     opts.Dockerfile,
+		Status:         "building",
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
 	}
@@ -45,25 +49,36 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Fprintln(w, builddata)
 }
 
+func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	ren.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	reg := registry.NewRegistry("localfs", "")
 	builds, err := reg.List()
 	if err != nil {
-		log.Fatal(err)
+		ren.JSON(w, http.StatusInternalServerError, "Something wrong :P")
 	}
 
-	fmt.Println(builds)
+	ren.JSON(w, http.StatusOK, builds)
 }
 
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	image := ps.ByName("image")
-	fmt.Fprintf(w, "Build %s!\n", image)
+	id := ps.ByName("id")
+	uuid := uuid.Parse(id)
+	reg := registry.NewRegistry("localfs", "")
+	build, err := reg.Get(uuid)
+	if err != nil {
+		ren.JSON(w, http.StatusNotFound, map[string]string{"status": "not found"})
+	}
+	ren.JSON(w, http.StatusOK, build)
 }
 
 func main() {
 	router := httprouter.New()
+	router.GET("/", root)
 	router.GET("/builds", index)
-	router.GET("/builds/:image", show)
+	router.GET("/builds/:id", show)
 	router.POST("/builds", create)
 
 	n := negroni.Classic()
