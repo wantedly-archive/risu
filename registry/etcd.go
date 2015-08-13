@@ -72,6 +72,31 @@ func (r *EtcdRegistry) Get(id uuid.UUID) (schema.Build, error) {
 	return build, nil
 }
 
+func (r *EtcdRegistry) List() ([]schema.Build, error) {
+	var builds []schema.Build
+
+	key := path.Join(r.keyPrefix)
+	res, err := r.etcd.Get(key, false, true)
+	if err != nil {
+		if isKeyNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	for _, node := range res.Node.Nodes {
+		var build schema.Build
+		err = unmarshal(node.Value, &build)
+		if err != nil {
+			return nil, err
+		}
+
+		builds = append(builds, build)
+	}
+
+	return builds, nil
+}
+
 func marshal(obj interface{}) (string, error) {
 	encoded, err := json.Marshal(obj)
 	if err != nil {
