@@ -69,7 +69,7 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusOK, build)
 }
 
-func main() {
+func setUpServer() *negroni.Negroni {
 	router := httprouter.New()
 	router.GET("/", root)
 	router.GET("/builds", index)
@@ -78,5 +78,10 @@ func main() {
 
 	n := negroni.Classic()
 	n.UseHandler(router)
+	return n
+}
+
+func main() {
+	n := setUpServer()
 	n.Run(":8080")
 }
