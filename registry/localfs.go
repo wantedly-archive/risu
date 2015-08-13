@@ -2,7 +2,6 @@ package registry
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 
 	"code.google.com/p/go-uuid/uuid"
@@ -19,7 +18,9 @@ type LocalFsRegistry struct {
 
 // NewLocalFsRegistry : init
 func NewLocalFsRegistry(path string) Registry {
-
+	if path == "" {
+		path = DefaultFilePath
+	}
 	return &LocalFsRegistry{path}
 }
 
@@ -30,26 +31,35 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(DefaultFilePath+string(build.ID)+".json", []byte(string(b)), 0666)
+	file, err := os.Create(DefaultFilePath + build.ID.String() + ".json")
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	buildDate := []byte(string(b))
+
+	_, err = file.Write(buildDate)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Get : get build
+// Get : get build data
 func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
-	targetBuildData, err := os.Open(DefaultFilePath + string(id) + ".json")
+	file, err := os.Open(DefaultFilePath + id.String() + ".json")
 	if err != nil {
 		return schema.Build{}, err
 	}
-	defer targetBuildData.Close()
+	defer file.Close()
 
 	var build schema.Build
 
-	decoder := json.NewDecoder(targetBuildData)
+	decoder := json.NewDecoder(file)
 
-	err = decoder.Decode(build)
+	err = decoder.Decode(&build)
 	if err != nil {
 		return schema.Build{}, err
 	}

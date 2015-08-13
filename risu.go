@@ -11,6 +11,7 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
 
+	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
 )
 
@@ -36,7 +37,11 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		UpdatedAt:      time.Now(),
 	}
 
-	fmt.Fprint(w, build)
+	reg := registry.NewRegistry("localfs", "")
+	reg.Set(build)
+
+	getBuildData, err := reg.Get(build.ID)
+	fmt.Fprintln(w, getBuildData)
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
