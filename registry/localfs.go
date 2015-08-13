@@ -2,6 +2,7 @@ package registry
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"os"
 
 	"code.google.com/p/go-uuid/uuid"
@@ -69,4 +70,32 @@ func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
 	}
 
 	return build, nil
+}
+
+func (r *LocalFsRegistry) List() ([]schema.Build, error) {
+	var builds []schema.Build
+
+	fileInfos, err := ioutil.ReadDir(r.path)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fileInfo := range fileInfos {
+		file, err := os.Open(r.path + fileInfo.Name())
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+
+		var build schema.Build
+
+		err = json.NewDecoder(file).Decode(&build)
+		if err != nil {
+			return nil, err
+		}
+
+		builds = append(builds, build)
+	}
+
+	return builds, nil
 }

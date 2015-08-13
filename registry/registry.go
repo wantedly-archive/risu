@@ -9,6 +9,7 @@ import (
 type Registry interface {
 	Set(build schema.Build) error
 	Get(id uuid.UUID) (schema.Build, error)
+	List() ([]schema.Build, error)
 }
 
 func NewRegistry(backend string, endpoint string) Registry {
