@@ -17,11 +17,18 @@ build後、Quay.io等のregistoryへpushをすることでbuild時間にフォ�
 * Vagrant
 * VirtualBox
 * Go 1.4 or later
+* [Godep](https://github.com/tools/godep)
 
 ## Install
 
 ```
 $ git clone https://github.com/koudaiii/risu.git
+```
+
+## Getting Started
+
+```
+$ script/bootstrap
 ```
 
 ## Usage
@@ -31,6 +38,12 @@ $ git clone https://github.com/koudaiii/risu.git
 * set quay.io token
 
 need set up XXX.conf? .env? .yml?
+
+### Build
+
+```
+$ godep go build
+```
 
 ### Run
 

@@ -47,6 +47,29 @@ else
 fi
 
 #
+# Prepare Go
+#
+if test $(which go)
+then
+  echo "  + Go found"
+else
+  echo "  x You need to install Go."
+  echo "    $ brew install go"
+  exit 1
+fi
+
+#
+# Prepare Godep
+#
+if test $(which godep)
+then
+  echo "  + Godep found"
+else
+  echo "  + Installing Godep..."
+  go get github.com/tools/godep
+fi
+
+#
 # Startup instructions
 #
 echo ""
