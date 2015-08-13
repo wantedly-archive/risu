@@ -39,6 +39,12 @@ $ script/bootstrap
 
 need set up XXX.conf? .env? .yml?
 
+### Build
+
+```
+$ godep go build
+```
+
 ### Run
 
 ```
