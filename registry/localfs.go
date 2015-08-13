@@ -53,6 +53,7 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 
 // Get : get build data
 func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
+	// TODO: add error handling.(Expired Data and Not Found File)
 	file, err := os.Open(r.path + id.String() + ".json")
 	if err != nil {
 		return schema.Build{}, err
