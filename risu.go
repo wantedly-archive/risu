@@ -33,6 +33,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		SourceRevision: opts.SourceRevision,
 		Name:           opts.Name,
 		Dockerfile:     opts.Dockerfile,
+		Status:         "building",
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
 	}

@@ -12,6 +12,7 @@ type Build struct {
 	SourceRevision string    `json:"source_revision"`
 	Name           string    `json:"name"`
 	Dockerfile     string    `json:"dockerfile"`
+	Status         string    `json:"status"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
 }
