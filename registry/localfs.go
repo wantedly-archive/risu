@@ -21,6 +21,10 @@ func NewLocalFsRegistry(path string) Registry {
 	if path == "" {
 		path = DefaultFilePath
 	}
+
+	if _, err := os.Stat(path); err != nil {
+		os.MkdirAll(path, 0755)
+	}
 	return &LocalFsRegistry{path}
 }
 
