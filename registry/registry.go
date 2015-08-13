@@ -17,6 +17,6 @@ func NewRegistry(backend string, endpoint string) Registry {
 	case "localfs":
 		return NewLocalFsRegistry(endpoint)
 	default:
-		return NewEtcdRegistry(endpoint)
+		return NewLocalFsRegistry(endpoint)
 	}
 }
