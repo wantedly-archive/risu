@@ -35,7 +35,7 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 		return err
 	}
 
-	file, err := os.Create(DefaultFilePath + build.ID.String() + ".json")
+	file, err := os.Create(r.path + build.ID.String() + ".json")
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 
 // Get : get build data
 func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
-	file, err := os.Open(DefaultFilePath + id.String() + ".json")
+	file, err := os.Open(r.path + id.String() + ".json")
 	if err != nil {
 		return schema.Build{}, err
 	}
