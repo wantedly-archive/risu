@@ -61,9 +61,7 @@ func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
 
 	var build schema.Build
 
-	decoder := json.NewDecoder(file)
-
-	err = decoder.Decode(&build)
+	err = json.NewDecoder(file).Decode(&build)
 	if err != nil {
 		return schema.Build{}, err
 	}
