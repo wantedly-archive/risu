@@ -46,8 +46,13 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	name := r.FormValue("name")
-	fmt.Fprintf(w, "Welcome, %s!\n", name)
+	reg := registry.NewRegistry("localfs", "")
+	builds, err := reg.List()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(builds)
 }
 
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -57,7 +62,7 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func main() {
 	router := httprouter.New()
-	router.GET("/", index)
+	router.GET("/builds", index)
 	router.GET("/builds/:image", show)
 	router.POST("/builds", create)
 
