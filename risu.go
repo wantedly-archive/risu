@@ -45,20 +45,25 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Fprintln(w, builddata)
 }
 
+func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	fmt.Fprintln(w, "Status OK")
+}
+
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	name := r.FormValue("name")
 	fmt.Fprintf(w, "Welcome, %s!\n", name)
 }
 
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	image := ps.ByName("image")
+	image := ps.ByName("id")
 	fmt.Fprintf(w, "Build %s!\n", image)
 }
 
 func main() {
 	router := httprouter.New()
-	router.GET("/", index)
-	router.GET("/builds/:image", show)
+	router.GET("/", root)
+	router.GET("/builds", index)
+	router.GET("/builds/:id", show)
 	router.POST("/builds", create)
 
 	n := negroni.Classic()
