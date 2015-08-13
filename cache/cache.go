@@ -63,6 +63,16 @@ func InflateTarGz(tarGzPath, inflateDir string) error {
 		return err
 	}
 
+	inflateDir, err = filepath.Abs(inflateDir)
+
+	if err != nil {
+		return err
+	}
+
+	if _, err = os.Stat(inflateDir); err != nil {
+		os.MkdirAll(inflateDir, 0755)
+	}
+
 	reader := tar.NewReader(gzfile)
 
 	for {
@@ -85,12 +95,12 @@ func InflateTarGz(tarGzPath, inflateDir string) error {
 				os.MkdirAll(outPath, 0755)
 			}
 
-		case tar.TypeReg:
+		case tar.TypeReg, tar.TypeRegA:
 			if _, err = io.Copy(buffer, reader); err != nil {
 				return err
 			}
 
-			if err = ioutil.WriteFile(header.Name, buffer.Bytes(), 0755); err != nil {
+			if err = ioutil.WriteFile(outPath, buffer.Bytes(), 0644); err != nil {
 				return err
 			}
 		}
