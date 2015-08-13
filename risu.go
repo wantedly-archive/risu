@@ -55,8 +55,14 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	image := ps.ByName("id")
-	fmt.Fprintf(w, "Build %s!\n", image)
+	id := ps.ByName("id")
+	uuid := uuid.Parse(id)
+	reg := registry.NewRegistry("localfs", "")
+	build, err := reg.Get(uuid)
+	if err != nil {
+		fmt.Fprintln(w, "Not Found") // FIXME
+	}
+	fmt.Fprintf(w, "Build %s!\n", build)
 }
 
 func main() {
