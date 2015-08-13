@@ -77,7 +77,7 @@ func InflateTarGz(tarGzPath, inflateDir string) error {
 		}
 
 		buffer := new(bytes.Buffer)
-		outPath := inflateDir + "/" + header.Name
+		outPath := inflateDir + string(filepath.Separator) + header.Name
 
 		switch header.Typeflag {
 		case tar.TypeDir:
