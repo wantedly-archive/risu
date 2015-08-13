@@ -12,6 +12,7 @@ import (
 	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
+	"github.com/wantedly/risu/repository"
 	"github.com/wantedly/risu/schema"
 )
 
@@ -51,6 +52,12 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	ren.JSON(w, http.StatusCreated, build)
+
+	// git clone
+	err = repository.GetRepository(build, "")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
