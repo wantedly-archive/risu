@@ -42,9 +42,9 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 
 	defer file.Close()
 
-	buildDate := []byte(string(b))
+	buildData := []byte(string(b))
 
-	_, err = file.Write(buildDate)
+	_, err = file.Write(buildData)
 	if err != nil {
 		return err
 	}
