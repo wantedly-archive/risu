@@ -57,7 +57,7 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	reg := registry.NewRegistry("localfs", "")
 	builds, err := reg.List()
 	if err != nil {
-		ren.JSON(w, http.StatusInternalServerError, "Something wrong :P")
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
 	}
 
 	ren.JSON(w, http.StatusOK, builds)
