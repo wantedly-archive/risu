@@ -4,16 +4,22 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+	"github.com/libgit2/git2go"
 	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
-	"github.com/wantedly/risu/repository"
 	"github.com/wantedly/risu/schema"
+)
+
+const (
+	GitHubHost           = "github.com/"
+	DefaultCloneBasePath = "/tmp/risu/repository/"
 )
 
 var ren = render.New()
@@ -54,7 +60,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusCreated, build)
 
 	// git clone
-	err = repository.GetRepository(build, "")
+	err = gitClone(build)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -86,6 +92,31 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusOK, build)
 }
 
+// Clone run "git clone <repository_URL>" and "git checkout rebision"
+func gitClone(build schema.Build) error {
+	basePath := DefaultCloneBasePath
+	if _, err := os.Stat(basePath); err != nil {
+		os.MkdirAll(basePath, 0755)
+	}
+
+	// htpps://<token>@github.com/<SourceRepo>.git
+	cloneURL := "https://" + os.Getenv("GITHUB_ACCESS_TOKEN") + "@" + GitHubHost + build.SourceRepo + ".git"
+
+	// debug
+	fmt.Println(cloneURL)
+
+	clonePath := basePath + build.SourceRepo
+
+	// debug
+	fmt.Println(clonePath)
+
+	_, err := git.Clone(cloneURL, clonePath, &git.CloneOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func setUpServer() *negroni.Negroni {
 	router := httprouter.New()
 	router.GET("/", root)
@@ -99,6 +130,9 @@ func setUpServer() *negroni.Negroni {
 }
 
 func main() {
-	n := setUpServer()
+	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
+		os.Exit(1)
+	}
+  n := setUpServer()
 	n.Run(":8080")
 }
