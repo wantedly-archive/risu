@@ -10,8 +10,9 @@ import (
 
 func TestGitClone(t *testing.T) {
 	opts := schema.BuildCreateOpts{
-		SourceRepo: "wantedly/private-nginx-image-server",
-		Name:       "quay.io/wantedly/private-nginx-image-server:test",
+		SourceRepo:   "wantedly/private-nginx-image-server",
+		SourceBranch: "patched-small-light",
+		Name:         "quay.io/wantedly/private-nginx-image-server:test",
 	}
 	build := schema.NewBuild(opts)
 	err := gitClone(build)

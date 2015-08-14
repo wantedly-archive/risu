@@ -99,10 +99,9 @@ func gitClone(build schema.Build) error {
 	// debug
 	fmt.Println(clonePath)
 
-	_, err := shell.Command("git", "clone", cloneURL, clonePath)
-	if err != nil {
-		return err
-	}
+	shell.Command("git", "clone", cloneURL, clonePath)
+	shell.CommandInDir(clonePath, "git", "fetch", "origin", build.SourceBranch)
+	shell.CommandInDir(clonePath, "git", "checkout", "remotes/origin/"+build.SourceBranch, "-f")
 	return nil
 }
 
