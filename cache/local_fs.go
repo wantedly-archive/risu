@@ -28,7 +28,7 @@ func NewLocalFsCache() Cache {
 
 func (c *LocalFsCache) Get(key string) (string, error) {
 	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
-	inflateDirPath := getInflateDirPath(c.cacheDir, key)
+	inflateDirPath := getInflateDirPath(DefaultInflatedCacheDir, key)
 
 	if _, err := os.Stat(archivedCacheFilePath); err != nil {
 		return "", nil

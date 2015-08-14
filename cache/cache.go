@@ -16,7 +16,7 @@ type Cache interface {
 }
 
 const (
-	DefaultCacheDir = "/tmp/risu/cache"
+	DefaultInflatedCacheDir = "/tmp/risu/cache"
 )
 
 func NewCache(backend string) Cache {
