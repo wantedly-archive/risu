@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
@@ -40,26 +39,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	if opts.SourceBranch == "" {
-		opts.SourceBranch = "master"
-	}
-
-	if opts.Dockerfile == "" {
-		opts.Dockerfile = "Dockerfile"
-	}
-
-	currentTime := time.Now()
-	build := schema.Build{
-		ID:           uuid.NewUUID(),
-		SourceRepo:   opts.SourceRepo,
-		SourceBranch: opts.SourceBranch,
-		Name:         opts.Name,
-		Dockerfile:   opts.Dockerfile,
-		Status:       "building",
-		CreatedAt:    currentTime,
-		UpdatedAt:    currentTime,
-	}
-
+	build := schema.NewBuild(opts)
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)
