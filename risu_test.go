@@ -89,4 +89,28 @@ func TestBuildFlow(t *testing.T) {
 		build.Dockerfile != "Dockerfile" {
 		t.Errorf("Create build failed \nGot: %v", build)
 	}
+
+	uuid := build.ID.String()
+
+	// Show
+	response = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "http://localhost:8080/builds/"+uuid, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	n.ServeHTTP(response, req)
+	if response.Code != http.StatusOK {
+		t.Errorf("Got error for Get ruquest to /builds/" + uuid)
+	}
+
+	dec = json.NewDecoder(response.Body)
+	dec.Decode(&build)
+
+	if build.ID.String() != uuid ||
+		build.SourceRepo != "wantedly/risu" ||
+		build.SourceBranch != "ada9ce1829fab49e605e5a563dbf91274f64e923" ||
+		build.ImageName != "quay.io/wantedly/risu:latest" ||
+		build.Dockerfile != "Dockerfile" {
+		t.Errorf("Show build failed \nGot: %v", build)
+	}
 }
