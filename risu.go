@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -133,6 +134,6 @@ func main() {
 	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
 		os.Exit(1)
 	}
-  n := setUpServer()
+	n := setUpServer()
 	n.Run(":8080")
 }
