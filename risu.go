@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	DefaultCacheDir = "/var/risu/cache"
-	SourceBasePath  = "/var/risu/src/github.com/"
+	CacheBasePath  = "/var/risu/cache"
+	SourceBasePath = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()
