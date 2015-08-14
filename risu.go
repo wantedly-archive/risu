@@ -40,14 +40,14 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	currentTime := time.Now()
 	build := schema.Build{
-		ID:             uuid.NewUUID(),
-		SourceRepo:     opts.SourceRepo,
-		SourceRevision: opts.SourceRevision,
-		Name:           opts.Name,
-		Dockerfile:     opts.Dockerfile,
-		Status:         "building",
-		CreatedAt:      currentTime,
-		UpdatedAt:      currentTime,
+		ID:           uuid.NewUUID(),
+		SourceRepo:   opts.SourceRepo,
+		SourceBranch: opts.SourceBranch,
+		Name:         opts.Name,
+		Dockerfile:   opts.Dockerfile,
+		Status:       "building",
+		CreatedAt:    currentTime,
+		UpdatedAt:    currentTime,
 	}
 
 	reg := registry.NewRegistry("localfs", "")
@@ -92,7 +92,7 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusOK, build)
 }
 
-// Clone run "git clone <repository_URL>" and "git checkout revision"
+// Clone run "git clone <repository_URL>" and "git checkout branch"
 func gitClone(build schema.Build) error {
 	basePath := DefaultCloneBasePath
 	if _, err := os.Stat(basePath); err != nil {
