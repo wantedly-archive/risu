@@ -19,28 +19,9 @@ const (
 
 func dockerBuild(build schema.Build) error {
 	clonePath := DefaultSourceBaseDir + build.SourceRepo
-	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
-	inflatedCachePath, err := cache.Get(getCacheKey(build.SourceRepo))
 
-	if err != nil {
+	if err := addCacheToSrcRepo(build, clonePath); err != nil {
 		return err
-	}
-
-	if inflatedCachePath != "" {
-		for _, cacheDirectory := range build.CacheDirectories {
-			cachePath := inflatedCachePath + string(filepath.Separator) + cacheDirectory["source"]
-			sourcePath := clonePath + string(filepath.Separator) + cacheDirectory["source"]
-
-			if _, err := os.Stat(sourcePath); err == nil {
-				if e := os.RemoveAll(sourcePath); e != nil {
-					return e
-				}
-			}
-
-			if err := os.Rename(cachePath, sourcePath); err != nil {
-				return err
-			}
-		}
 	}
 
 	dockerEndpoint := os.Getenv("DOCKER_HOST")
@@ -69,6 +50,34 @@ func dockerBuild(build schema.Build) error {
 
 	if err := client.BuildImage(opts); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func addCacheToSrcRepo(build schema.Build, clonePath string) error {
+	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
+	inflatedCachePath, err := cache.Get(getCacheKey(build.SourceRepo))
+
+	if err != nil {
+		return err
+	}
+
+	if inflatedCachePath != "" {
+		for _, cacheDirectory := range build.CacheDirectories {
+			cachePath := inflatedCachePath + string(filepath.Separator) + cacheDirectory["source"]
+			sourcePath := clonePath + string(filepath.Separator) + cacheDirectory["source"]
+
+			if _, err := os.Stat(sourcePath); err == nil {
+				if e := os.RemoveAll(sourcePath); e != nil {
+					return e
+				}
+			}
+
+			if err := os.Rename(cachePath, sourcePath); err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
