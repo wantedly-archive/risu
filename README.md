@@ -85,11 +85,31 @@ $ docker run \
 
 ## Cache Backend
 ### localfs
-TBD
+
+```bash
+$ docker run \
+    --name risu \
+    -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -p 8080:8080 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    quay.io/wantedly/risu:latest
+```
 
 ### S3
-TBD
 
+```bash
+$ docker run \
+    --name risu \
+    -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e CACHE_BACKEND=s3 \
+    -e AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX \
+    -e AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+    -e AWS_REGION=xx-yyyy-0 \
+    -e RISU_CACHE_BUCKET=xxxx \
+    -p 8080:8080 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    quay.io/wantedly/risu:latest
+```
 
 ## Contribution
 
