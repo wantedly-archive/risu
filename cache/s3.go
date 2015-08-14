@@ -30,7 +30,7 @@ func NewS3Cache() Cache {
 	}
 
 	if cacheDir == "" {
-		cacheDir = DefaultCacheDir
+		cacheDir = CacheBasePath
 	}
 
 	if os.Getenv("RISU_CACHE_BUCKET") == "" {
@@ -55,7 +55,7 @@ func NewS3Cache() Cache {
 
 func (c *S3Cache) Get(key string) (string, error) {
 	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
-	inflateDirPath := getInflateDirPath(c.cacheDir, key)
+	inflateDirPath := getInflateDirPath(DefaultInflatedCacheDir, key)
 
 	_, err := c.s3Client.HeadObject(
 		&s3.HeadObjectInput{
