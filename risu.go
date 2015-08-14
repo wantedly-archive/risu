@@ -134,7 +134,7 @@ func dockerPush(build schema.Build) error {
 	}
 
 	nameTag := strings.Split(build.Name, ":")
-	dockerRegistry := strings.toSlash(build.Name)
+	dockerRegistry := strings.Split(build.Name, "/")
 
 	outputbuf := bytes.NewBuffer(nil)
 	// push build image
@@ -177,7 +177,6 @@ func setUpServer() *negroni.Negroni {
 func main() {
 	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
 		log.Fatal("Please provide 'GITHUB_ACCESS_TOKEN' through environment")
-		os.Exit(1)
 	}
 	n := setUpServer()
 	n.Run(":8080")
