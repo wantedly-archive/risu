@@ -31,6 +31,12 @@ func dockerBuild(build schema.Build) error {
 			cachePath := inflatedCachePath + string(filepath.Separator) + cacheDirectory["source"]
 			sourcePath := clonePath + string(filepath.Separator) + cacheDirectory["source"]
 
+			if _, err := os.Stat(sourcePath); err == nil {
+				if e := os.RemoveAll(sourcePath); e != nil {
+					return e
+				}
+			}
+
 			if err := os.Rename(cachePath, sourcePath); err != nil {
 				return err
 			}
