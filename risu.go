@@ -34,6 +34,10 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
+	if opts.SourceBranch == "" {
+		opts.SourceBranch = "master"
+	}
+
 	if opts.Dockerfile == "" {
 		opts.Dockerfile = "Dockerfile"
 	}
@@ -110,7 +114,7 @@ func gitClone(build schema.Build) error {
 	// debug
 	fmt.Println(clonePath)
 
-	_, err := git.Clone(cloneURL, clonePath, &git.CloneOptions{})
+	_, err := git.Clone(cloneURL, clonePath, &git.CloneOptions{CheckoutBranch: build.SourceBranch})
 	if err != nil {
 		return err
 	}
