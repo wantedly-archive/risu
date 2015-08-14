@@ -15,13 +15,12 @@ const (
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
 )
 
-func DockerBuild(build *schema.Build) {
+func DockerBuild(build *schema.Build) error {
 	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
 	inflatedCachePath, err := cache.Get(build.ID.String())
 
 	if err != nil {
-		log.Fatal(err)
-		return
+		return err
 	}
 
 	if inflatedCachePath != "" {
@@ -41,8 +40,7 @@ func DockerBuild(build *schema.Build) {
 	client, err := docker.NewClient(dockerEndpoint)
 
 	if err != nil {
-		log.Fatal(err)
-		return
+		return err
 	}
 
 	outputbuf := bytes.NewBuffer(nil)
@@ -58,10 +56,8 @@ func DockerBuild(build *schema.Build) {
 	}
 
 	if err := client.BuildImage(opts); err != nil {
-		log.Fatal(err)
-		return
+		return err
 	}
 
-	os.Stdout.Write(outputbuf.Bytes())
-	return
+	return nil
 }
