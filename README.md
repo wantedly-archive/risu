@@ -1,4 +1,4 @@
-# Risu
+# RISU (Rapid Image Supplying Unit)
 Risu is an build tool for docker image with original cache mechanism.
 
 ![](https://cloud.githubusercontent.com/assets/261700/9082260/c51e910c-3b9d-11e5-9202-f0ab05207ac6.png)
