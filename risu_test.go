@@ -8,14 +8,14 @@ import (
 	"github.com/wantedly/risu/schema"
 )
 
-func TestGitClone(t *testing.T) {
+func TestCheckoutGitRepository(t *testing.T) {
 	opts := schema.BuildCreateOpts{
 		SourceRepo:   "wantedly/private-nginx-image-server",
 		SourceBranch: "patched-small-light",
 		Name:         "quay.io/wantedly/private-nginx-image-server:test",
 	}
 	build := schema.NewBuild(opts)
-	err := gitClone(build)
+	err := checkoutGitRepository(build, "/tmp/risu/src/github.com/")
 	if err != nil {
 		t.Error(err)
 	}

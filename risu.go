@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	SourceBasePath = "/var/risu/src/github.com/"
-	CacheBasePath  = "/var/risu/cache"
+	DefaultSourceBaseDir = "/var/risu/src/github.com/"
+	CacheBaseDir         = "/var/risu/cache/"
 )
 
 var ren = render.New()
@@ -45,7 +45,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusAccepted, build)
 
 	go func() {
-		if err := gitClone(build); err != nil {
+		if err := checkoutGitRepository(build, DefaultSourceBaseDir); err != nil {
 			return
 		}
 
@@ -83,9 +83,9 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 // Clone run "git clone <repository_URL>" and "git checkout branch"
-func gitClone(build schema.Build) error {
-	if _, err := os.Stat(SourceBasePath); err != nil {
-		os.MkdirAll(SourceBasePath, 0755)
+func checkoutGitRepository(build schema.Build, dir string) error {
+	if _, err := os.Stat(dir); err != nil {
+		os.MkdirAll(dir, 0755)
 	}
 
 	// htpps://<token>@github.com/<SourceRepo>.git
@@ -94,7 +94,7 @@ func gitClone(build schema.Build) error {
 	// debug
 	fmt.Println(cloneURL)
 
-	clonePath := SourceBasePath + build.SourceRepo
+	clonePath := dir + build.SourceRepo
 
 	// debug
 	fmt.Println(clonePath)
