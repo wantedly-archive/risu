@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/julienschmidt/httprouter"
 	"github.com/libgit2/git2go"
 	"github.com/unrolled/render"
@@ -19,8 +22,9 @@ import (
 )
 
 const (
-	SourceBasePath = "/var/risu/src/github.com/"
-	CacheBasePath  = "/var/risu/cache"
+	SourceBasePath        = "/var/risu/src/github.com/"
+	CacheBasePath         = "/var/risu/cache"
+	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
 )
 
 var ren = render.New()
@@ -130,10 +134,47 @@ func dockerBuild(build schema.Build) error {
 	return nil
 }
 
-// func dockerPush(build schema.Build) error {
-// TODO (@koudaii)
-//	return nil
-// }
+func dockerPush(build schema.Build) error {
+	// TODO (@koudaii)
+
+	var dockerEndpoint string
+
+	if os.Getenv("DOCKER_HOST") != "" {
+		dockerEndpoint = os.Getenv("DOCKER_HOST")
+	}
+
+	if dockerEndpoint == "" {
+		dockerEndpoint = DefaultDockerEndpoint
+	}
+
+	client, err := docker.NewClient(dockerEndpoint)
+
+	if err != nil {
+		return err
+	}
+
+	nametag := strings.Split(build.Name, ":")
+
+	outputbuf := bytes.NewBuffer(nil)
+	// push build image
+	pushOpts := docker.PushImageOptions{
+		Name:         nametag[0],
+		Tag:          nametag[1],
+		Registry:     "quay.io",
+		OutputStream: outputbuf,
+	}
+	authConfig := docker.AuthConfiguration{
+		Username:      "spesnova",
+		Password:      "XXXXXXXXXXXXXXXXXXXXX",
+		Email:         "spesnova@gmail.com",
+		ServerAddress: "quay.io",
+	}
+	if err := client.PushImage(pushOpts, authConfig); err != nil {
+		return err
+	}
+	os.Stdout.Write(outputbuf.Bytes())
+	return nil
+}
 
 func pushCache(build schema.Build) error {
 	// TODO (@dtan4)
