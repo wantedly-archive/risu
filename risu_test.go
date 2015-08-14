@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -64,9 +65,8 @@ func TestBuildFlow(t *testing.T) {
 
 	requestParams := `{
 		"source_repo": "wantedly/risu",
-		"source_revision": "ada9ce1829fab49e605e5a563dbf91274f64e923",
-		"name": "quay.io/wantedly/risu:latest",
-		"dockerfile": "Dockerfile.dev"
+		"source_branch": "ada9ce1829fab49e605e5a563dbf91274f64e923",
+		"image_name": "quay.io/wantedly/risu:latest"
 	}`
 
 	// Create
@@ -75,29 +75,18 @@ func TestBuildFlow(t *testing.T) {
 		t.Error(err)
 	}
 	n.ServeHTTP(response, req)
-	if response.Code != http.StatusOK {
-		t.Errorf("Got error for GET ruquest to /")
-	}
-	body := string(response.Body.Bytes())
-	if body != "hoge" {
-		t.Errorf("Got: %v", body)
+	if response.Code != http.StatusAccepted {
+		t.Errorf("Got error for POST ruquest to /builds")
 	}
 
-	// dec := json.NewDecoder(response.Body)
-	// var build schema.Build
-	// dec.Decode(&build)
-	// expectedBuild := schema.Build{
-	// 	ID:             uuid.NewUUID(),
-	// 	SourceRepo:     "opts.SourceRepo",
-	// 	SourceRevision: "opts.SourceRevision",
-	// 	Name:           "opts.Name",
-	// 	Dockerfile:     "Dockerfile",
-	// 	Status:         "building",
-	// 	CreatedAt:      time.Now(),
-	// 	UpdatedAt:      time.Now(),
-	// }
-	//
-	// if !build.Equals(expectedBuild) {
-	// 	t.Errorf("Got empty body for GET request to /\n Got: %v\nExpected: %v", build, expectedBuild)
-	// }
+	dec := json.NewDecoder(response.Body)
+	var build schema.Build
+	dec.Decode(&build)
+
+	if build.SourceRepo != "wantedly/risu" ||
+		build.SourceBranch != "ada9ce1829fab49e605e5a563dbf91274f64e923" ||
+		build.ImageName != "quay.io/wantedly/risu:latest" ||
+		build.Dockerfile != "Dockerfile" {
+		t.Errorf("Create build failed \nGot: %v", build)
+	}
 }
