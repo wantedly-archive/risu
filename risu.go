@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	GitHubHost           = "github.com/"
 	DefaultCloneBasePath = "/tmp/risu/repository/"
 )
 
@@ -101,7 +100,7 @@ func gitClone(build schema.Build) error {
 	}
 
 	// htpps://<token>@github.com/<SourceRepo>.git
-	cloneURL := "https://" + os.Getenv("GITHUB_ACCESS_TOKEN") + "@" + GitHubHost + build.SourceRepo + ".git"
+	cloneURL := "https://" + os.Getenv("GITHUB_ACCESS_TOKEN") + "@github.com/" + build.SourceRepo + ".git"
 
 	// debug
 	fmt.Println(cloneURL)
