@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -24,6 +23,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	err := json.NewDecoder(r.Body).Decode(&opts)
 	if err != nil {
 		log.Fatal(err)
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
 	}
 
 	if opts.Dockerfile == "" {
@@ -43,11 +43,13 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	}
 
 	reg := registry.NewRegistry("localfs", "")
-	reg.Set(build)
+	err = reg.Set(build)
+	if err != nil {
+		log.Fatal(err)
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+	}
 
-	// debug code
-	builddata, err := reg.Get(build.ID)
-	fmt.Fprintln(w, builddata)
+	ren.JSON(w, http.StatusCreated, build)
 }
 
 func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
