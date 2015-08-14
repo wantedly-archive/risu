@@ -2,16 +2,11 @@ package cache
 
 import (
 	"os"
-	"path/filepath"
 )
 
 type LocalFsCache struct {
 	cacheDir string
 }
-
-const (
-	DefaultCacheDir = "/tmp/risu/cache"
-)
 
 func NewLocalFsCache() Cache {
 	var cacheDir string
@@ -32,32 +27,24 @@ func NewLocalFsCache() Cache {
 }
 
 func (c *LocalFsCache) Get(key string) (string, error) {
-	cache := cachePath(c.cacheDir, key)
-	inflateDir := inflateDirPath(c.cacheDir, key)
+	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
+	inflateDirPath := getInflateDirPath(c.cacheDir, key)
 
-	if _, err := os.Stat(cache); err != nil {
+	if _, err := os.Stat(archivedCacheFilePath); err != nil {
 		return "", nil
 	}
 
-	if err := InflateTarGz(cache, inflateDir); err != nil {
+	if err := InflateTarGz(archivedCacheFilePath, inflateDirPath); err != nil {
 		return "", err
 	}
 
-	return inflateDir, nil
+	return inflateDirPath, nil
 }
 
 func (c *LocalFsCache) Put(key, directory string) error {
-	if err := DeflateTarGz(cachePath(c.cacheDir, key), directory); err != nil {
+	if err := DeflateTarGz(getArchivedCacheFilePath(c.cacheDir, key), directory); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func cachePath(cacheDir, key string) string {
-	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
-}
-
-func inflateDirPath(cacheDir, key string) string {
-	return cacheDir + string(filepath.Separator) + key
 }

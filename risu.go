@@ -24,6 +24,7 @@ const (
 )
 
 var ren = render.New()
+var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
@@ -55,20 +56,26 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		UpdatedAt:    currentTime,
 	}
 
-	reg := registry.NewRegistry("localfs", "")
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
 		return
 	}
-	ren.JSON(w, http.StatusCreated, build)
+	ren.JSON(w, http.StatusAccepted, build)
 
-	// git clone
-	err = gitClone(build)
-	if err != nil {
-		log.Fatal(err)
-	}
+	go func() {
+		if err := gitClone(build); err != nil {
+			return
+		}
+
+		if err := dockerBuild(build); err != nil {
+			return
+		}
+
+		go dockerPush(build)
+		go pushCache(build)
+	}()
 }
 
 func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -76,7 +83,6 @@ func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	reg := registry.NewRegistry("localfs", "")
 	builds, err := reg.List()
 	if err != nil {
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
@@ -88,7 +94,6 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id := ps.ByName("id")
 	uuid := uuid.Parse(id)
-	reg := registry.NewRegistry("localfs", "")
 	build, err := reg.Get(uuid)
 	if err != nil {
 		ren.JSON(w, http.StatusNotFound, map[string]string{"status": "not found"})
@@ -118,6 +123,19 @@ func gitClone(build schema.Build) error {
 	if err != nil {
 		return err
 	}
+
+func dockerBuild(build schema.Build) error {
+	// TODO (@dtan4)
+	return nil
+}
+
+func dockerPush(build schema.Build) error {
+	// TODO (@koudaii)
+	return nil
+}
+
+func pushCache(build schema.Build) error {
+	// TODO (@dtan4)
 	return nil
 }
 

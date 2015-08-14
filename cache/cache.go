@@ -15,10 +15,16 @@ type Cache interface {
 	Put(key, directory string) error
 }
 
+const (
+	DefaultCacheDir = "/tmp/risu/cache"
+)
+
 func NewCache(backend string) Cache {
 	switch backend {
 	case "local":
 		return NewLocalFsCache()
+	case "s3":
+		return NewS3Cache()
 	default:
 		return NewLocalFsCache()
 	}
@@ -169,4 +175,12 @@ func writeTarGz(filePath, baseDir string, tarGzWriter *tar.Writer, fileInfo os.F
 	}
 
 	return nil
+}
+
+func getArchivedCacheFilePath(cacheDir, key string) string {
+	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
+}
+
+func getInflateDirPath(cacheDir, key string) string {
+	return cacheDir + string(filepath.Separator) + key
 }
