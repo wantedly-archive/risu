@@ -16,7 +16,7 @@ func TestCheckoutGitRepository(t *testing.T) {
 		SourceRepo: "wantedly/risu",
 		ImageName:  "quay.io/wantedly/risu:test",
 	}
-	build := schema.NewBuild(opts)
+	build := schema.NewBuild(&opts)
 	err := checkoutGitRepository(build, "/tmp/risu/src/github.com/")
 	if err != nil {
 		t.Error(err)
