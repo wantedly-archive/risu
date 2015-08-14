@@ -10,6 +10,9 @@ First, run risu server as docker container.
 $ docker run \
     --name risu \
     -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e DOCKER_AUTH_USER_NAME=your_name \
+    -e DOCKER_AUTH_USER_PASSWORD=your_password \
+    -e DOCKER_AUTH_USER_EMAIL=your_email \
     -p 8080:8080 \
     -v /var/run/docker.sock:/var/run/docker.sock \
     quay.io/wantedly/risu:latest
@@ -54,6 +57,10 @@ That's it!
 ## Requirements
 
 * `GITHUB_ACCESS_TOKEN`
+* `DOCKER_AUTH_USER_NAME`
+* `DOCKER_AUTH_USER_PASSWORD`
+* `DOCKER_AUTH_USER_EMAIL`
+
 
 ## How It Works
 TBD
@@ -65,6 +72,9 @@ TBD
 $ docker run \
     --name risu \
     -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e DOCKER_AUTH_USER_NAME=your_name \
+    -e DOCKER_AUTH_USER_PASSWORD=your_password \
+    -e DOCKER_AUTH_USER_EMAIL=your_email \
     -p 8080:8080 \
     -v /var/run/docker.sock:/var/run/docker.sock \
     quay.io/wantedly/risu:latest
@@ -76,6 +86,9 @@ $ docker run \
 $ docker run \
     --name risu \
     -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e DOCKER_AUTH_USER_NAME=your_name \
+    -e DOCKER_AUTH_USER_PASSWORD=your_password \
+    -e DOCKER_AUTH_USER_EMAIL=your_email \
     -e REGISTRY_BACKEND=etcd \
     -e REGISTRY_ENDPOINT=http://172.17.8.101:4001 \
     -p 8080:8080 \
@@ -90,6 +103,9 @@ $ docker run \
 $ docker run \
     --name risu \
     -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e DOCKER_AUTH_USER_NAME=your_name \
+    -e DOCKER_AUTH_USER_PASSWORD=your_password \
+    -e DOCKER_AUTH_USER_EMAIL=your_email \
     -p 8080:8080 \
     -v /var/run/docker.sock:/var/run/docker.sock \
     quay.io/wantedly/risu:latest
@@ -101,6 +117,9 @@ $ docker run \
 $ docker run \
     --name risu \
     -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e DOCKER_AUTH_USER_NAME=your_name \
+    -e DOCKER_AUTH_USER_PASSWORD=your_password \
+    -e DOCKER_AUTH_USER_EMAIL=your_email \
     -e CACHE_BACKEND=s3 \
     -e AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX \
     -e AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
