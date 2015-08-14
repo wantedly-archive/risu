@@ -43,11 +43,7 @@ func dockerBuild(build schema.Build) error {
 		}
 	}
 
-	var dockerEndpoint string
-
-	if os.Getenv("DOCKER_HOST") != "" {
-		dockerEndpoint = os.Getenv("DOCKER_HOST")
-	}
+	dockerEndpoint := os.Getenv("DOCKER_HOST")
 
 	if dockerEndpoint == "" {
 		dockerEndpoint = DefaultDockerEndpoint
