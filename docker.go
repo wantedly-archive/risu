@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/fsouza/go-dockerclient"
 
@@ -52,6 +53,48 @@ func dockerBuild(build schema.Build) error {
 		return err
 	}
 
+	return nil
+}
+
+func dockerPush(build schema.Build) error {
+
+	var dockerEndpoint string
+
+	if os.Getenv("DOCKER_HOST") != "" {
+		dockerEndpoint = os.Getenv("DOCKER_HOST")
+	}
+
+	if dockerEndpoint == "" {
+		dockerEndpoint = DefaultDockerEndpoint
+	}
+
+	client, err := docker.NewClient(dockerEndpoint)
+
+	if err != nil {
+		return err
+	}
+
+	dockerImageName := strings.Split(build.ImageName, ":")[0]
+	dockerImageTag := strings.Split(build.ImageName, ":")[1]
+	dockerRegistry := strings.Split(build.ImageName, "/")
+
+	outputbuf := bytes.NewBuffer(nil)
+	// push build image
+	pushOpts := docker.PushImageOptions{
+		Name:         dockerImageName,
+		Tag:          dockerImageTag,
+		Registry:     dockerRegistry[0],
+		OutputStream: outputbuf,
+	}
+	authConfig := docker.AuthConfiguration{
+		Username:      os.Getenv("DOCKER_AUTH_USER_NAME"),
+		Password:      os.Getenv("DOCKER_AUTH_USER_PASSWORD"),
+		Email:         os.Getenv("DOCKER_AUTH_USER_EMAIL"),
+		ServerAddress: dockerRegistry[0],
+	}
+	if err := client.PushImage(pushOpts, authConfig); err != nil {
+		return err
+	}
 	return nil
 }
 
