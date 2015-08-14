@@ -87,7 +87,7 @@ func TestBuildFlow(t *testing.T) {
 		build.SourceBranch != "ada9ce1829fab49e605e5a563dbf91274f64e923" ||
 		build.ImageName != "quay.io/wantedly/risu:latest" ||
 		build.Dockerfile != "Dockerfile" {
-		t.Errorf("Create build failed \nGot: %v", build)
+		t.Errorf("Create build failed.\nGot: %v", build)
 	}
 
 	uuid := build.ID.String()
@@ -111,6 +111,24 @@ func TestBuildFlow(t *testing.T) {
 		build.SourceBranch != "ada9ce1829fab49e605e5a563dbf91274f64e923" ||
 		build.ImageName != "quay.io/wantedly/risu:latest" ||
 		build.Dockerfile != "Dockerfile" {
-		t.Errorf("Show build failed \nGot: %v", build)
+		t.Errorf("Show build failed.\nGot: %v", build)
+	}
+
+	// Index
+	response = httptest.NewRecorder()
+	req, err = http.NewRequest("GET", "http://localhost:8080/builds", nil)
+	if err != nil {
+		t.Error(err)
+	}
+	n.ServeHTTP(response, req)
+	if response.Code != http.StatusOK {
+		t.Errorf("Got error for Get ruquest to /builds")
+	}
+
+	builds := make([]schema.Build, 0)
+	dec = json.NewDecoder(response.Body)
+	dec.Decode(&builds)
+	if len(builds) == 0 {
+		t.Errorf("Fail to index builds.\nGot: %v", builds)
 	}
 }
