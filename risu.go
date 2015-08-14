@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,10 +11,16 @@ import (
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
+	"github.com/libgit2/git2go"
 	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
+)
+
+const (
+	SourceBasePath = "/var/risu/src/github.com/"
+	CacheBasePath  = "/var/risu/cache"
 )
 
 var ren = render.New()
@@ -29,20 +36,24 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
+	if opts.SourceBranch == "" {
+		opts.SourceBranch = "master"
+	}
+
 	if opts.Dockerfile == "" {
 		opts.Dockerfile = "Dockerfile"
 	}
 
 	currentTime := time.Now()
 	build := schema.Build{
-		ID:             uuid.NewUUID(),
-		SourceRepo:     opts.SourceRepo,
-		SourceRevision: opts.SourceRevision,
-		Name:           opts.Name,
-		Dockerfile:     opts.Dockerfile,
-		Status:         "building",
-		CreatedAt:      currentTime,
-		UpdatedAt:      currentTime,
+		ID:           uuid.NewUUID(),
+		SourceRepo:   opts.SourceRepo,
+		SourceBranch: opts.SourceBranch,
+		Name:         opts.Name,
+		Dockerfile:   opts.Dockerfile,
+		Status:       "building",
+		CreatedAt:    currentTime,
+		UpdatedAt:    currentTime,
 	}
 
 	err = reg.Set(build)
@@ -91,10 +102,27 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusOK, build)
 }
 
+// Clone run "git clone <repository_URL>" and "git checkout branch"
 func gitClone(build schema.Build) error {
-	// TODO (@koudaii)
-	return nil
-}
+	if _, err := os.Stat(SourceBasePath); err != nil {
+		os.MkdirAll(SourceBasePath, 0755)
+	}
+
+	// htpps://<token>@github.com/<SourceRepo>.git
+	cloneURL := "https://" + os.Getenv("GITHUB_ACCESS_TOKEN") + "@github.com/" + build.SourceRepo + ".git"
+
+	// debug
+	fmt.Println(cloneURL)
+
+	clonePath := SourceBasePath + build.SourceRepo
+
+	// debug
+	fmt.Println(clonePath)
+
+	_, err := git.Clone(cloneURL, clonePath, &git.CloneOptions{CheckoutBranch: build.SourceBranch})
+	if err != nil {
+		return err
+	}
 
 func dockerBuild(build schema.Build) error {
 	// TODO (@dtan4)
@@ -124,6 +152,10 @@ func setUpServer() *negroni.Negroni {
 }
 
 func main() {
+	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
+		log.Fatal("Please provide 'GITHUB_ACCESS_TOKEN' through environment")
+		os.Exit(1)
+	}
 	n := setUpServer()
 	n.Run(":8080")
 }
