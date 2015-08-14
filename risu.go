@@ -1,14 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/unrolled/render"
@@ -19,8 +22,9 @@ import (
 )
 
 const (
-	DefaultSourceBaseDir = "/var/risu/src/github.com/"
 	CacheBaseDir         = "/var/risu/cache/"
+	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
+	DefaultSourceBaseDir  = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()
@@ -114,7 +118,6 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 	shell.CommandInDir(clonePath, "git", "checkout", "remotes/origin/"+build.SourceBranch, "-f")
 	return nil
 }
-
 func dockerBuild(build schema.Build) error {
 	// TODO (@dtan4)
 	return nil
@@ -122,6 +125,44 @@ func dockerBuild(build schema.Build) error {
 
 func dockerPush(build schema.Build) error {
 	// TODO (@koudaii)
+
+	var dockerEndpoint string
+
+	if os.Getenv("DOCKER_HOST") != "" {
+		dockerEndpoint = os.Getenv("DOCKER_HOST")
+	}
+
+	if dockerEndpoint == "" {
+		dockerEndpoint = DefaultDockerEndpoint
+	}
+
+	client, err := docker.NewClient(dockerEndpoint)
+
+	if err != nil {
+		return err
+	}
+
+	nameTag := strings.Split(build.ImageName, ":")
+	dockerRegistry := strings.Split(build.ImageName, "/")
+
+	outputbuf := bytes.NewBuffer(nil)
+	// push build image
+	pushOpts := docker.PushImageOptions{
+		Name:         nameTag[0],
+		Tag:          nameTag[1],
+		Registry:     dockerRegistry[0],
+		OutputStream: outputbuf,
+	}
+	authConfig := docker.AuthConfiguration{
+		Username:      os.Getenv("DOCKER_AUTH_USER_NAME"),
+		Password:      os.Getenv("DOCKER_AUTH_USER_PASSWORD"),
+		Email:         os.Getenv("DOCKER_AUTH_USER_EMAIL"),
+		ServerAddress: dockerRegistry[0],
+	}
+	if err := client.PushImage(pushOpts, authConfig); err != nil {
+		return err
+	}
+	os.Stdout.Write(outputbuf.Bytes())
 	return nil
 }
 
