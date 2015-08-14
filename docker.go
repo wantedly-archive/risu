@@ -1,9 +1,12 @@
 package main
 
 import (
+	"archive/tar"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,8 +59,103 @@ func dockerBuild(build schema.Build) error {
 	return nil
 }
 
-func dockerPush(build schema.Build) error {
+func dockerCopy(build schema.Build) (string, error) {
+	dockerEndpoint := os.Getenv("DOCKER_HOST")
 
+	if dockerEndpoint == "" {
+		dockerEndpoint = DefaultDockerEndpoint
+	}
+
+	client, err := docker.NewClient(dockerEndpoint)
+
+	if err != nil {
+		return "", err
+	}
+
+	container, err := client.CreateContainer(
+		docker.CreateContainerOptions{
+			Config: &docker.Config{
+				Hostname:        "",
+				Domainname:      "",
+				User:            "",
+				AttachStdin:     false,
+				AttachStdout:    false,
+				AttachStderr:    false,
+				Tty:             false,
+				OpenStdin:       false,
+				StdinOnce:       false,
+				Env:             nil,
+				Cmd:             []string{"sleep", "3600"},
+				Entrypoint:      []string{},
+				Image:           build.ImageName,
+				Labels:          nil,
+				Volumes:         nil,
+				WorkingDir:      "",
+				NetworkDisabled: false,
+				MacAddress:      "",
+				ExposedPorts:    nil,
+			},
+			HostConfig: &docker.HostConfig{},
+		})
+
+	if err != nil {
+		return "", err
+	}
+
+	saveBaseDir := c.DefaultInflatedCacheDir + getCacheKey(build.SourceRepo) + "/"
+
+	for _, cacheDirectory := range build.CacheDirectories {
+		outputbuf := bytes.NewBuffer(nil)
+
+		if err = client.CopyFromContainer(
+			docker.CopyFromContainerOptions{
+				Container:    container.ID,
+				OutputStream: outputbuf,
+				Resource:     cacheDirectory["container"],
+			}); err != nil {
+			return "", err
+		}
+
+		reader := tar.NewReader(outputbuf)
+
+		for {
+			header, err := reader.Next()
+
+			if err == io.EOF {
+				break
+			}
+
+			if err != nil {
+				return "", err
+			}
+
+			buffer := new(bytes.Buffer)
+			outPath := saveBaseDir + header.Name
+
+			switch header.Typeflag {
+			case tar.TypeDir:
+				if _, err = os.Stat(outPath); err != nil {
+					os.MkdirAll(outPath, 0755)
+				}
+
+			case tar.TypeReg, tar.TypeRegA:
+				if _, err = io.Copy(buffer, reader); err != nil {
+					return "", err
+				}
+
+				if err = ioutil.WriteFile(outPath, buffer.Bytes(), 0644); err != nil {
+					return "", err
+				}
+			}
+		}
+	}
+
+	// TODO: Stop & Remove container
+
+	return saveBaseDir, nil
+}
+
+func dockerPush(build schema.Build) error {
 	var dockerEndpoint string
 
 	if os.Getenv("DOCKER_HOST") != "" {
