@@ -12,22 +12,30 @@ import (
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/fsouza/go-dockerclient"
+	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
-	"github.com/libgit2/git2go"
 	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
+	"github.com/wantedly/risu/shell"
 )
 
 const (
-	SourceBasePath        = "/var/risu/src/github.com/"
 	CacheBasePath         = "/var/risu/cache"
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
+	SourceBasePath        = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()
 var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
+
+func loadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Print("Error loading .env file")
+	}
+}
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
@@ -49,7 +57,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusAccepted, build)
 
 	go func() {
-		if err := gitClone(build); err != nil {
+		if err := checkoutGitRepository(build, DefaultSourceBaseDir); err != nil {
 			return
 		}
 
@@ -87,9 +95,9 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 // Clone run "git clone <repository_URL>" and "git checkout branch"
-func gitClone(build schema.Build) error {
-	if _, err := os.Stat(SourceBasePath); err != nil {
-		os.MkdirAll(SourceBasePath, 0755)
+func checkoutGitRepository(build schema.Build, dir string) error {
+	if _, err := os.Stat(dir); err != nil {
+		os.MkdirAll(dir, 0755)
 	}
 
 	// htpps://<token>@github.com/<SourceRepo>.git
@@ -98,15 +106,14 @@ func gitClone(build schema.Build) error {
 	// debug
 	fmt.Println(cloneURL)
 
-	clonePath := SourceBasePath + build.SourceRepo
+	clonePath := dir + build.SourceRepo
 
 	// debug
 	fmt.Println(clonePath)
 
-	_, err := git.Clone(cloneURL, clonePath, &git.CloneOptions{CheckoutBranch: build.SourceBranch})
-	if err != nil {
-		return err
-	}
+	shell.Command("git", "clone", cloneURL, clonePath)
+	shell.CommandInDir(clonePath, "git", "fetch", "origin", build.SourceBranch)
+	shell.CommandInDir(clonePath, "git", "checkout", "remotes/origin/"+build.SourceBranch, "-f")
 	return nil
 }
 func dockerBuild(build schema.Build) error {
@@ -175,6 +182,7 @@ func setUpServer() *negroni.Negroni {
 }
 
 func main() {
+	loadEnv()
 	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
 		log.Fatal("Please provide 'GITHUB_ACCESS_TOKEN' through environment")
 	}
