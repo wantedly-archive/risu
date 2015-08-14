@@ -3,6 +3,7 @@ package registry
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"code.google.com/p/go-uuid/uuid"
@@ -25,7 +26,9 @@ func NewLocalFsRegistry(path string) Registry {
 	}
 
 	if _, err := os.Stat(path); err != nil {
-		os.MkdirAll(path, 0755)
+		if err = os.MkdirAll(path, 0755); err != nil {
+			log.Fatal(err)
+		}
 	}
 	return &LocalFsRegistry{path}
 }

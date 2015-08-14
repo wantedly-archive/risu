@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
@@ -19,8 +18,8 @@ import (
 )
 
 const (
-	SourceBasePath = "/var/risu/src/github.com/"
 	CacheBasePath  = "/var/risu/cache"
+	SourceBasePath = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()
@@ -36,26 +35,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	if opts.SourceBranch == "" {
-		opts.SourceBranch = "master"
-	}
-
-	if opts.Dockerfile == "" {
-		opts.Dockerfile = "Dockerfile"
-	}
-
-	currentTime := time.Now()
-	build := schema.Build{
-		ID:           uuid.NewUUID(),
-		SourceRepo:   opts.SourceRepo,
-		SourceBranch: opts.SourceBranch,
-		Name:         opts.Name,
-		Dockerfile:   opts.Dockerfile,
-		Status:       "building",
-		CreatedAt:    currentTime,
-		UpdatedAt:    currentTime,
-	}
-
+	build := schema.NewBuild(opts)
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)

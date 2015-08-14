@@ -18,7 +18,7 @@ definitions:
     type:
     - string
   source_repo:
-    description: source github source_repositry to build. It must includes Dockerfile
+    description: source github repositry to build. It must includes Dockerfile
     required: true,
     example: "wantedly/risu"
     type:
@@ -42,6 +42,17 @@ definitions:
     default: "Dockerfile"
     type:
     - string
+  cache_directories:
+    description: directory paths that you want to cache
+    required: true
+    example: [
+      { "source": "vendor/bundle", "container": "/app/vendor/bundle"},
+      { "source": "vendor/assets", "container": "/app/vendor/assets"},
+    ]
+    type:
+    - array
+    items:
+      type: object
   status:
     description: status of build. one of "failed" or "building" or "succeeded"
     readOnly: true
@@ -79,6 +90,9 @@ links:
       "dockerfile": {
         "$ref": "/schemata/build#/definitions/dockerfile"
       },
+      "cache_directories": {
+        "$ref": "/schemata/build#/definitions/cache_directories"
+      },
     }
     type:
     - object
@@ -104,6 +118,8 @@ properties:
     "$ref": "/schemata/build#/definitions/name"
   dockerfile:
     "$ref": "/schemata/build#/definitions/dockerfile"
+  cache_directories:
+    "$ref": "/schemata/build#/definitions/cache_directories"
   status:
     "$ref": "/schemata/build#/definitions/status"
   created_at:
