@@ -1,91 +1,99 @@
-# risu
+# Risu
+Risu is an build tool for docker image with original cache mechanism.
 
-## Overview
+![](https://cloud.githubusercontent.com/assets/261700/9082260/c51e910c-3b9d-11e5-9202-f0ab05207ac6.png)
 
-* risu is rapid image supply unit
+## Quick start
+First, run risu server as docker container.
 
-## Description
-
-DockerHubやQuay.ioのSaaS、CI as a Serviceでは、Queueの状態やStackの状態で待たされたり、bundle install や assets:precompileを初期状態から行うため、build時間も30m以上かかる。
-
-risuは自前で用意したServer上でコンテナをbuildを行う。
-buildをする際に、ボトルネックとなったbundle install や assets:precompileをcacheとして利用し、高速化を図る。
-build後、Quay.io等のregistoryへpushをすることでbuild時間にフォーカスして高速化を図ることを目的としたツールである。
-
-## Requirement
-
-* Vagrant
-* VirtualBox
-* Go 1.4 or later
-* [Godep](https://github.com/tools/godep)
-
-## Install
-
-```
-$ git clone https://github.com/koudaiii/risu.git
+```bash
+$ docker run \
+    --name risu \
+    -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -p 8080:8080 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    quay.io/wantedly/risu:latest
 ```
 
-## Getting Started
+Second, trigger a new build via risu API.
 
-```
-$ script/bootstrap
-```
-
-## Usage
-
-### required
-
-* set quay.io token
-
-need set up XXX.conf? .env? .yml?
-
-### Build
-
-```
-$ godep go build
-```
-
-### Run
-
-```
-go command
+```bash
+$ curl -n -X POST https://<your-risu-server>.com/builds \
+  -H "Content-Type: application/json" \
+ \
+  -d '{
+  "source_repo": "wantedly/risu",
+  "source_branch": "master",
+  "image_name": "quay.io/wantedly/risu:latest",
+  "dockerfile": "Dockerfile.dev",
+  "cache_directories": [
+    {
+      "source": "vendor/bundle",
+      "container": "/app/vendor/bundle"
+    },
+    {
+      "source": "vendor/assets",
+      "container": "/app/vendor/assets"
+    }
+  ]
+}'
 ```
 
-* Ominiauth in GitHub
+Then, risu server build docker image with original cache mechanism and push it to docker registry.
 
-image shot 1
+That's it!
 
-* set up webhook in repository
+## Documentation
+### HTTP API
 
-image shot 2
+* [Build](https://github.com/wantedly/risu/blob/master/docs/api-v1-alpha.md#build)
+ * [Create](https://github.com/wantedly/risu/blob/master/docs/api-v1-alpha.md#build-create)
+ * [Info](https://github.com/wantedly/risu/blob/master/docs/api-v1-alpha.md#build-info)
+ * [List](https://github.com/wantedly/risu/blob/master/docs/api-v1-alpha.md#build-list)
 
-* git push repository
+## Requirements
 
-image shot 3
+* `GITHUB_ACCESS_TOKEN`
 
-## FEATURE
+## How it works
+TBD
 
- * GitHubにあるprivate repositoryをweb hook経由で取得する
- * HostはCoreOS,Containerを用意する
- * Containerはとbuild用(quay.ioへPush用)
- * cacheの更新する
-  * Host上で $  bundle package で gem install とともに、vendor/cache/ に保存 download
-  * Host上で $  bundle exec rake assets:precompile
- * 更新したcacheをADDさせて docker build する
-  * bundle install --path vendor/bundle --local
- * Quay.ioにimageをPush
+## Registry Backend
+### localfs Backend Registry
 
- - [ ] JSON Scheme設計(status,docker image URL)
- - [ ] GitHub連携でhookからrepositoryを取得
- - [ ] cache設計
- - [ ] docker build cached
- - [ ] docker build image
- - [ ] Quay.ioへimageをPushする
- - [ ] Quay.ioからSlackなどへNotificationする
+```bash
+$ docker run \
+    --name risu \
+    -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -p 8080:8080 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    quay.io/wantedly/risu:latest
+```
+
+### etcd Backend Registry
+
+```bash
+$ docker run \
+    --name risu \
+    -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
+    -e REGISTRY_BACKEND=etcd \
+    -e REGISTRY_ENDPOINT=http://172.17.8.101:4001 \
+    -p 8080:8080 \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    quay.io/wantedly/risu:latest
+```
+
+## Cache Backend
+### localfs
+TBD
+
+### S3
+TBD
+
 
 ## Contribution
 
-1. Fork it ( http://github.com/koudaiii/risu )
+1. Fork it ( http://github.com/wantedly/risu )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
