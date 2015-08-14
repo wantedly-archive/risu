@@ -54,8 +54,8 @@ func NewS3Cache() Cache {
 }
 
 func (c *S3Cache) Get(key string) (string, error) {
-	temporaryCache := cacheFilePath(c.cacheDir, key)
 	inflateDir := inflateDirPath(c.cacheDir, key)
+	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
 
 	_, err := c.s3Client.HeadObject(
 		&s3.HeadObjectInput{
@@ -89,11 +89,11 @@ func (c *S3Cache) Get(key string) (string, error) {
 		return "", err
 	}
 
-	if err = ioutil.WriteFile(temporaryCache, data, 0644); err != nil {
+	if err = ioutil.WriteFile(archivedCacheFilePath, data, 0644); err != nil {
 		return "", err
 	}
 
-	if err = InflateTarGz(temporaryCache, inflateDir); err != nil {
+	if err = InflateTarGz(archivedCacheFilePath, inflateDirPath); err != nil {
 		return "", err
 	}
 
@@ -101,13 +101,13 @@ func (c *S3Cache) Get(key string) (string, error) {
 }
 
 func (c *S3Cache) Put(key, directory string) error {
-	temporaryCache := cacheFilePath(c.cacheDir, key)
+	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
 
-	if err := DeflateTarGz(temporaryCache, directory); err != nil {
+	if err := DeflateTarGz(archivedCacheFilePath, directory); err != nil {
 		return err
 	}
 
-	file, err := os.Open(temporaryCache)
+	file, err := os.Open(archivedCacheFilePath)
 
 	if err != nil {
 		return err

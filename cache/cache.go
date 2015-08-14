@@ -177,7 +177,7 @@ func writeTarGz(filePath, baseDir string, tarGzWriter *tar.Writer, fileInfo os.F
 	return nil
 }
 
-func cacheFilePath(cacheDir, key string) string {
+func getArchivedCacheFilePath(cacheDir, key string) string {
 	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
 }
 

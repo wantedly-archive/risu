@@ -27,14 +27,14 @@ func NewLocalFsCache() Cache {
 }
 
 func (c *LocalFsCache) Get(key string) (string, error) {
-	cachePath := cacheFilePath(c.cacheDir, key)
+	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
 	inflateDir := inflateDirPath(c.cacheDir, key)
 
-	if _, err := os.Stat(cachePath); err != nil {
+	if _, err := os.Stat(archivedCacheFilePath); err != nil {
 		return "", nil
 	}
 
-	if err := InflateTarGz(cachePath, inflateDir); err != nil {
+	if err := InflateTarGz(archivedCacheFilePath, inflateDir); err != nil {
 		return "", err
 	}
 
@@ -42,7 +42,7 @@ func (c *LocalFsCache) Get(key string) (string, error) {
 }
 
 func (c *LocalFsCache) Put(key, directory string) error {
-	if err := DeflateTarGz(cacheFilePath(c.cacheDir, key), directory); err != nil {
+	if err := DeflateTarGz(getArchivedCacheFilePath(c.cacheDir, key), directory); err != nil {
 		return err
 	}
 
