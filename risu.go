@@ -123,6 +123,7 @@ func gitClone(build schema.Build) error {
 	if err != nil {
 		return err
 	}
+}
 
 func dockerBuild(build schema.Build) error {
 	// TODO (@dtan4)
