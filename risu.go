@@ -44,7 +44,6 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		UpdatedAt:      currentTime,
 	}
 
-	reg.Set(build)
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)
