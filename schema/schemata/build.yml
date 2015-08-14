@@ -18,18 +18,19 @@ definitions:
     type:
     - string
   source_repo:
-    description: source github source_repositry to build. It must includes Dockerfile
+    description: source github repositry to build. It must includes Dockerfile
     required: true,
     example: "wantedly/risu"
     type:
     - string
-  source_revision:
-    description: git revision to use for build. (also you can use git tag/branch for this).
+  source_branch:
+    description: git branch to use for build.
     required: true,
-    example: "ada9ce1829fab49e605e5a563dbf91274f64e923"
+    example: "master"
+    default: "master"
     type:
     - string
-  name:
+  image_name:
     description: a repository name (and optionally a tag) to apply to the resulting image in case of success.
     required: true,
     example: "quay.io/wantedly/risu:latest"
@@ -41,6 +42,17 @@ definitions:
     default: "Dockerfile"
     type:
     - string
+  cache_directories:
+    description: directory paths that you want to cache
+    required: true
+    example: [
+      { "source": "vendor/bundle", "container": "/app/vendor/bundle"},
+      { "source": "vendor/assets", "container": "/app/vendor/assets"},
+    ]
+    type:
+    - array
+    items:
+      type: object
   status:
     description: status of build. one of "failed" or "building" or "succeeded"
     readOnly: true
@@ -69,14 +81,17 @@ links:
       "source_repo": {
         "$ref": "/schemata/build#/definitions/source_repo"
       },
-      "source_revision": {
-        "$ref": "/schemata/build#/definitions/source_revision"
+      "source_branch": {
+        "$ref": "/schemata/build#/definitions/source_branch"
       },
-      "name": {
-        "$ref": "/schemata/build#/definitions/name"
+      "image_name": {
+        "$ref": "/schemata/build#/definitions/image_name"
       },
       "dockerfile": {
         "$ref": "/schemata/build#/definitions/dockerfile"
+      },
+      "cache_directories": {
+        "$ref": "/schemata/build#/definitions/cache_directories"
       },
     }
     type:
@@ -97,12 +112,14 @@ properties:
     "$ref": "/schemata/build#/definitions/id"
   source_repo:
     "$ref": "/schemata/build#/definitions/source_repo"
-  source_revision:
-    "$ref": "/schemata/build#/definitions/source_revision"
-  name:
-    "$ref": "/schemata/build#/definitions/name"
+  source_branch:
+    "$ref": "/schemata/build#/definitions/source_branch"
+  image_name:
+    "$ref": "/schemata/build#/definitions/image_name"
   dockerfile:
     "$ref": "/schemata/build#/definitions/dockerfile"
+  cache_directories:
+    "$ref": "/schemata/build#/definitions/cache_directories"
   status:
     "$ref": "/schemata/build#/definitions/status"
   created_at:

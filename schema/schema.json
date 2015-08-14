@@ -31,22 +31,23 @@
           ]
         },
         "source_repo": {
-          "description": "source github source_repositry to build. It must includes Dockerfile",
+          "description": "source github repositry to build. It must includes Dockerfile",
           "required": "true,",
           "example": "wantedly/risu",
           "type": [
             "string"
           ]
         },
-        "source_revision": {
-          "description": "git revision to use for build. (also you can use git tag/branch for this).",
+        "source_branch": {
+          "description": "git branch to use for build.",
           "required": "true,",
-          "example": "ada9ce1829fab49e605e5a563dbf91274f64e923",
+          "example": "master",
+          "default": "master",
           "type": [
             "string"
           ]
         },
-        "name": {
+        "image_name": {
           "description": "a repository name (and optionally a tag) to apply to the resulting image in case of success.",
           "required": "true,",
           "example": "quay.io/wantedly/risu:latest",
@@ -61,6 +62,28 @@
           "type": [
             "string"
           ]
+        },
+        "cache_directories": {
+          "description": "directory paths that you want to cache",
+          "required": true,
+          "example": [
+            {
+              "source": "vendor/bundle",
+              "container": "/app/vendor/bundle"
+            },
+            {
+              "source": "vendor/assets",
+              "container": "/app/vendor/assets"
+            }
+          ],
+          "type": [
+            "array"
+          ],
+          "items": {
+            "type": [
+              "object"
+            ]
+          }
         },
         "status": {
           "description": "status of build. one of \"failed\" or \"building\" or \"succeeded\"",
@@ -98,14 +121,17 @@
               "source_repo": {
                 "$ref": "#/definitions/build/definitions/source_repo"
               },
-              "source_revision": {
-                "$ref": "#/definitions/build/definitions/source_revision"
+              "source_branch": {
+                "$ref": "#/definitions/build/definitions/source_branch"
               },
-              "name": {
-                "$ref": "#/definitions/build/definitions/name"
+              "image_name": {
+                "$ref": "#/definitions/build/definitions/image_name"
               },
               "dockerfile": {
                 "$ref": "#/definitions/build/definitions/dockerfile"
+              },
+              "cache_directories": {
+                "$ref": "#/definitions/build/definitions/cache_directories"
               }
             },
             "type": [
@@ -136,14 +162,17 @@
         "source_repo": {
           "$ref": "#/definitions/build/definitions/source_repo"
         },
-        "source_revision": {
-          "$ref": "#/definitions/build/definitions/source_revision"
+        "source_branch": {
+          "$ref": "#/definitions/build/definitions/source_branch"
         },
-        "name": {
-          "$ref": "#/definitions/build/definitions/name"
+        "image_name": {
+          "$ref": "#/definitions/build/definitions/image_name"
         },
         "dockerfile": {
           "$ref": "#/definitions/build/definitions/dockerfile"
+        },
+        "cache_directories": {
+          "$ref": "#/definitions/build/definitions/cache_directories"
         },
         "status": {
           "$ref": "#/definitions/build/definitions/status"

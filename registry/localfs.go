@@ -3,6 +3,7 @@ package registry
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"code.google.com/p/go-uuid/uuid"
@@ -10,24 +11,26 @@ import (
 	"github.com/wantedly/risu/schema"
 )
 
-// DefaultFilePath is default file path
-const DefaultFilePath = "/tmp/risu/"
+// DefaultFileDir is default file dir
+const DefaultFileDir = "/etc/risu/"
 
-// LocalFsRegistry is sharing path
+// LocalFsRegistry is sharing dir
 type LocalFsRegistry struct {
-	path string
+	dir string
 }
 
 // NewLocalFsRegistry is init
-func NewLocalFsRegistry(path string) Registry {
-	if path == "" {
-		path = DefaultFilePath
+func NewLocalFsRegistry(dir string) Registry {
+	if dir == "" {
+		dir = DefaultFileDir
 	}
 
-	if _, err := os.Stat(path); err != nil {
-		os.MkdirAll(path, 0755)
+	if _, err := os.Stat(dir); err != nil {
+		if err = os.MkdirAll(dir, 0755); err != nil {
+			log.Fatal(err)
+		}
 	}
-	return &LocalFsRegistry{path}
+	return &LocalFsRegistry{dir}
 }
 
 // Set stores the build data to a json file. file name is "/tmp/risu/<UUID>.json".
@@ -37,7 +40,7 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 		return err
 	}
 
-	file, err := os.Create(r.path + build.ID.String() + ".json")
+	file, err := os.Create(r.dir + build.ID.String() + ".json")
 	if err != nil {
 		return err
 	}
@@ -56,7 +59,7 @@ func (r *LocalFsRegistry) Set(build schema.Build) error {
 // Get get build data
 func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
 	// TODO: add error handling.(Expired Data and Not Found File)
-	file, err := os.Open(r.path + id.String() + ".json")
+	file, err := os.Open(r.dir + id.String() + ".json")
 	if err != nil {
 		return schema.Build{}, err
 	}
@@ -75,13 +78,13 @@ func (r *LocalFsRegistry) Get(id uuid.UUID) (schema.Build, error) {
 func (r *LocalFsRegistry) List() ([]schema.Build, error) {
 	var builds []schema.Build
 
-	fileInfos, err := ioutil.ReadDir(r.path)
+	fileInfos, err := ioutil.ReadDir(r.dir)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, fileInfo := range fileInfos {
-		file, err := os.Open(r.path + fileInfo.Name())
+		file, err := os.Open(r.dir + fileInfo.Name())
 		if err != nil {
 			return nil, err
 		}
