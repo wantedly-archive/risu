@@ -76,21 +76,20 @@ func dockerPush(build schema.Build) error {
 
 	dockerImageName := strings.Split(build.ImageName, ":")[0]
 	dockerImageTag := strings.Split(build.ImageName, ":")[1]
-	dockerRegistry := strings.Split(build.ImageName, "/")
+	dockerRegistry := strings.Split(build.ImageName, "/")[0]
 
 	outputbuf := bytes.NewBuffer(nil)
-	// push build image
 	pushOpts := docker.PushImageOptions{
 		Name:         dockerImageName,
 		Tag:          dockerImageTag,
-		Registry:     dockerRegistry[0],
+		Registry:     dockerRegistry,
 		OutputStream: outputbuf,
 	}
 	authConfig := docker.AuthConfiguration{
 		Username:      os.Getenv("DOCKER_AUTH_USER_NAME"),
 		Password:      os.Getenv("DOCKER_AUTH_USER_PASSWORD"),
 		Email:         os.Getenv("DOCKER_AUTH_USER_EMAIL"),
-		ServerAddress: dockerRegistry[0],
+		ServerAddress: dockerRegistry,
 	}
 	if err := client.PushImage(pushOpts, authConfig); err != nil {
 		return err
