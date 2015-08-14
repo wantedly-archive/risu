@@ -30,7 +30,7 @@ definitions:
     default: "master"
     type:
     - string
-  name:
+  image_name:
     description: a repository name (and optionally a tag) to apply to the resulting image in case of success.
     required: true,
     example: "quay.io/wantedly/risu:latest"
@@ -84,8 +84,8 @@ links:
       "source_branch": {
         "$ref": "/schemata/build#/definitions/source_branch"
       },
-      "name": {
-        "$ref": "/schemata/build#/definitions/name"
+      "image_name": {
+        "$ref": "/schemata/build#/definitions/image_name"
       },
       "dockerfile": {
         "$ref": "/schemata/build#/definitions/dockerfile"
@@ -114,8 +114,8 @@ properties:
     "$ref": "/schemata/build#/definitions/source_repo"
   source_branch:
     "$ref": "/schemata/build#/definitions/source_branch"
-  name:
-    "$ref": "/schemata/build#/definitions/name"
+  image_name:
+    "$ref": "/schemata/build#/definitions/image_name"
   dockerfile:
     "$ref": "/schemata/build#/definitions/dockerfile"
   cache_directories:

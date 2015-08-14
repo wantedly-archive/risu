@@ -10,7 +10,7 @@ type Build struct {
 	ID               uuid.UUID           `json:"id"`
 	SourceRepo       string              `json:"source_repo"`
 	SourceBranch     string              `json:"source_branch"`
-	Name             string              `json:"name"`
+	ImageName        string              `json:"image_name"`
 	Dockerfile       string              `json:"dockerfile"`
 	CacheDirectories []map[string]string `json:"cache_directories"`
 	Status           string              `json:"status"`
@@ -21,7 +21,7 @@ type Build struct {
 type BuildCreateOpts struct {
 	SourceRepo       string              `json:"source_repo"`
 	SourceBranch     string              `json:"source_branch"`
-	Name             string              `json:"name"`
+	ImageName        string              `json:"image_name"`
 	Dockerfile       string              `json:"dockerfile"`
 	CacheDirectories []map[string]string `json:"cache_directories"`
 }
@@ -41,7 +41,7 @@ func NewBuild(opts BuildCreateOpts) Build {
 		ID:               uuid.NewUUID(),
 		SourceRepo:       opts.SourceRepo,
 		SourceBranch:     opts.SourceBranch,
-		Name:             opts.Name,
+		ImageName:        opts.ImageName,
 		Dockerfile:       opts.Dockerfile,
 		CacheDirectories: opts.CacheDirectories,
 		Status:           "building",
