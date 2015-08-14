@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"os"
+	"strings"
 
 	"github.com/fsouza/go-dockerclient"
 
@@ -31,11 +32,13 @@ func dockerPush(build schema.Build) error {
 		return err
 	}
 
+	nametag := strings.Split(build.Name, ":")
+
 	outputbuf := bytes.NewBuffer(nil)
 	// push build image
 	pushOpts := docker.PushImageOptions{
-		Name:         build.Name,
-		Tag:          "latest",
+		Name:         nametag[0],
+		Tag:          nametag[1],
 		Registry:     "quay.io",
 		OutputStream: outputbuf,
 	}
