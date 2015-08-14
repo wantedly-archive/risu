@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	CacheBasePath         = "/var/risu/cache"
+	CacheBaseDir         = "/var/risu/cache"
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
 	DefaultSourceBaseDir  = "/var/risu/src/github.com/"
 )
