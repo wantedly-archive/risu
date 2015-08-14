@@ -66,17 +66,13 @@
 		},
 		{
 			"ImportPath": "github.com/joho/godotenv",
-			"Comment": "v1-6-gf658182",
-			"Rev": "f6581828bb37238bc1ce8e561d9e4050630a304d"
+			"Comment": "v1-8-g443e926",
+			"Rev": "443e926da0d793d3b3f32118b1e4ba52ada26503"
 		},
 		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Comment": "v1.1-3-g6aacfd5",
 			"Rev": "6aacfd5ab513e34f7e64ea9627ab9670371b34e7"
-		},
-		{
-			"ImportPath": "github.com/libgit2/git2go",
-			"Rev": "3d15c877d8d34c4268a7455bc60129681fa09100"
 		},
 		{
 			"ImportPath": "github.com/ugorji/go/codec",
