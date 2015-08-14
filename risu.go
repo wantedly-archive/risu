@@ -9,6 +9,7 @@ import (
 
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
+	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/unrolled/render"
 
@@ -24,6 +25,13 @@ const (
 
 var ren = render.New()
 var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
+
+func loadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Print("Error loading .env file")
+	}
+}
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
@@ -133,6 +141,7 @@ func setUpServer() *negroni.Negroni {
 }
 
 func main() {
+	loadEnv()
 	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
 		log.Fatal("Please provide 'GITHUB_ACCESS_TOKEN' through environment")
 	}
