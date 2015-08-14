@@ -16,6 +16,7 @@ type Cache interface {
 }
 
 const (
+	CacheBaseDir            = "/var/risu/cache/"
 	DefaultInflatedCacheDir = "/tmp/risu/cache"
 )
 

@@ -22,9 +22,7 @@ import (
 )
 
 const (
-	CacheBaseDir          = "/var/risu/cache/"
-	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
-	DefaultSourceBaseDir  = "/var/risu/src/github.com/"
+	DefaultSourceBaseDir = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()

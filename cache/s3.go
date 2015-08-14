@@ -30,7 +30,7 @@ func NewS3Cache() Cache {
 	}
 
 	if cacheDir == "" {
-		cacheDir = CacheBasePath
+		cacheDir = CacheBaseDir
 	}
 
 	if os.Getenv("RISU_CACHE_BUCKET") == "" {

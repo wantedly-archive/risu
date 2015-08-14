@@ -16,7 +16,7 @@ func NewLocalFsCache() Cache {
 	}
 
 	if cacheDir == "" {
-		cacheDir = CacheBasePath
+		cacheDir = CacheBaseDir
 	}
 
 	if _, err := os.Stat(cacheDir); err != nil {

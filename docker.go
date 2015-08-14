@@ -18,7 +18,7 @@ const (
 )
 
 func dockerBuild(build schema.Build) error {
-	clonePath := SourceBasePath + build.SourceRepo
+	clonePath := DefaultSourceBaseDir + build.SourceRepo
 	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
 	inflatedCachePath, err := cache.Get(getCacheKey(build.SourceRepo))
 
@@ -55,7 +55,7 @@ func dockerBuild(build schema.Build) error {
 
 	outputbuf := bytes.NewBuffer(nil)
 	opts := docker.BuildImageOptions{
-		Name:                build.Name,
+		Name:                build.ImageName,
 		NoCache:             false,
 		SuppressOutput:      true,
 		RmTmpContainer:      true,
