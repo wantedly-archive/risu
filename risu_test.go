@@ -13,7 +13,7 @@ func TestCheckoutGitRepository(t *testing.T) {
 	opts := schema.BuildCreateOpts{
 		SourceRepo:   "wantedly/private-nginx-image-server",
 		SourceBranch: "patched-small-light",
-		Name:         "quay.io/wantedly/private-nginx-image-server:test",
+		ImageName:    "quay.io/wantedly/private-nginx-image-server:test",
 	}
 	build := schema.NewBuild(opts)
 	err := checkoutGitRepository(build, "/tmp/risu/src/github.com/")
