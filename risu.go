@@ -24,6 +24,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err != nil {
 		log.Fatal(err)
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+		return
 	}
 
 	if opts.Dockerfile == "" {
@@ -47,8 +48,8 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err != nil {
 		log.Fatal(err)
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+		return
 	}
-
 	ren.JSON(w, http.StatusCreated, build)
 }
 
@@ -61,9 +62,9 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	builds, err := reg.List()
 	if err != nil {
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
-	} else {
-		ren.JSON(w, http.StatusOK, builds)
+		return
 	}
+	ren.JSON(w, http.StatusOK, builds)
 }
 
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -73,9 +74,9 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	build, err := reg.Get(uuid)
 	if err != nil {
 		ren.JSON(w, http.StatusNotFound, map[string]string{"status": "not found"})
-	} else {
-		ren.JSON(w, http.StatusOK, build)
+		return
 	}
+	ren.JSON(w, http.StatusOK, build)
 }
 
 func setUpServer() *negroni.Negroni {
