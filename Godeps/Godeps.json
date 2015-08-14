@@ -61,6 +61,10 @@
 			"Rev": "ae9c884b259b094bf0d5df886307e080f5392a72"
 		},
 		{
+			"ImportPath": "github.com/fsouza/go-dockerclient",
+			"Rev": "cadf1f84dcd33b7c0118ef5336263d0a0ae2eecf"
+		},
+		{
 			"ImportPath": "github.com/julienschmidt/httprouter",
 			"Comment": "v1.1-3-g6aacfd5",
 			"Rev": "6aacfd5ab513e34f7e64ea9627ab9670371b34e7"
