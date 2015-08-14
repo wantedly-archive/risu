@@ -126,11 +126,6 @@ func gitClone(build schema.Build) error {
 	return nil
 }
 
-func dockerBuild(build schema.Build) error {
-	// TODO (@dtan4)
-	return nil
-}
-
 func dockerPush(build schema.Build) error {
 	// TODO (@koudaii)
 	return nil

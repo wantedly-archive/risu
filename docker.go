@@ -14,7 +14,7 @@ const (
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
 )
 
-func DockerBuild(build *schema.Build) error {
+func dockerBuild(build schema.Build) error {
 	clonePath := SourceBasePath + build.SourceRepo
 	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
 	inflatedCachePath, err := cache.Get(build.ID.String())
