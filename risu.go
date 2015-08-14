@@ -22,9 +22,7 @@ import (
 )
 
 const (
-	CacheBaseDir         = "/var/risu/cache/"
-	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
-	DefaultSourceBaseDir  = "/var/risu/src/github.com/"
+	DefaultSourceBaseDir = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()
@@ -116,10 +114,6 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 	shell.Command("git", "clone", cloneURL, clonePath)
 	shell.CommandInDir(clonePath, "git", "fetch", "origin", build.SourceBranch)
 	shell.CommandInDir(clonePath, "git", "checkout", "remotes/origin/"+build.SourceBranch, "-f")
-	return nil
-}
-func dockerBuild(build schema.Build) error {
-	// TODO (@dtan4)
 	return nil
 }
 

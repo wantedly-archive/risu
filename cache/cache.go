@@ -16,7 +16,8 @@ type Cache interface {
 }
 
 const (
-	DefaultInflatedCacheDir = "/tmp/risu/cache"
+	DefaultTarCacheDir      = "/var/risu/cache/"
+	DefaultInflatedCacheDir = "/tmp/risu/cache/"
 )
 
 func NewCache(backend string) Cache {
@@ -178,9 +179,9 @@ func writeTarGz(filePath, baseDir string, tarGzWriter *tar.Writer, fileInfo os.F
 }
 
 func getArchivedCacheFilePath(cacheDir, key string) string {
-	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
+	return cacheDir + key + ".tar.gz"
 }
 
 func getInflateDirPath(cacheDir, key string) string {
-	return cacheDir + string(filepath.Separator) + key
+	return cacheDir + key
 }
