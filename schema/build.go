@@ -23,3 +23,26 @@ type BuildCreateOpts struct {
 	Name         string `json:"name"`
 	Dockerfile   string `json:"dockerfile"`
 }
+
+// NewBuild creates new build struct
+func NewBuild(opts BuildCreateOpts) Build {
+	if opts.SourceBranch == "" {
+		opts.SourceBranch = "master"
+	}
+
+	if opts.Dockerfile == "" {
+		opts.Dockerfile = "Dockerfile"
+	}
+
+	currentTime := time.Now()
+	return Build{
+		ID:           uuid.NewUUID(),
+		SourceRepo:   opts.SourceRepo,
+		SourceBranch: opts.SourceBranch,
+		Name:         opts.Name,
+		Dockerfile:   opts.Dockerfile,
+		Status:       "building",
+		CreatedAt:    currentTime,
+		UpdatedAt:    currentTime,
+	}
+}
