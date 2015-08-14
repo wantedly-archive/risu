@@ -2,7 +2,10 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"os"
+	"path/filepath"
 
 	"github.com/fsouza/go-dockerclient"
 
@@ -17,14 +20,21 @@ const (
 func dockerBuild(build schema.Build) error {
 	clonePath := SourceBasePath + build.SourceRepo
 	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
-	inflatedCachePath, err := cache.Get(build.ID.String())
+	inflatedCachePath, err := cache.Get(getCacheKey(build.SourceRepo))
 
 	if err != nil {
 		return err
 	}
 
 	if inflatedCachePath != "" {
-		// put cache to repository
+		for _, cacheDirectory := range build.CacheDirectories {
+			cachePath := inflatedCachePath + string(filepath.Separator) + cacheDirectory["source"]
+			sourcePath := clonePath + string(filepath.Separator) + cacheDirectory["source"]
+
+			if err := os.Rename(cachePath, sourcePath); err != nil {
+				return err
+			}
+		}
 	}
 
 	var dockerEndpoint string
@@ -52,7 +62,7 @@ func dockerBuild(build schema.Build) error {
 		ForceRmTmpContainer: true,
 		Dockerfile:          build.Dockerfile,
 		OutputStream:        outputbuf,
-		ContextDir:          clonePath, // TODO: Set `git clone` destination
+		ContextDir:          clonePath,
 	}
 
 	if err := client.BuildImage(opts); err != nil {
@@ -60,4 +70,11 @@ func dockerBuild(build schema.Build) error {
 	}
 
 	return nil
+}
+
+func getCacheKey(text string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(text))
+
+	return hex.EncodeToString(hasher.Sum(nil))[0:12]
 }
