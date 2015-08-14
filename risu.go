@@ -123,6 +123,8 @@ func gitClone(build schema.Build) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
 func dockerBuild(build schema.Build) error {
 	// TODO (@dtan4)
@@ -154,7 +156,6 @@ func setUpServer() *negroni.Negroni {
 func main() {
 	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
 		log.Fatal("Please provide 'GITHUB_ACCESS_TOKEN' through environment")
-		os.Exit(1)
 	}
 	n := setUpServer()
 	n.Run(":8080")
