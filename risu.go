@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	DefaultCloneBasePath = "/tmp/risu/repository/"
+	DefaultCloneBasePath = "/var/risu/src/"
 )
 
 var ren = render.New()
@@ -109,7 +109,7 @@ func gitClone(build schema.Build) error {
 	// debug
 	fmt.Println(cloneURL)
 
-	clonePath := basePath + build.SourceRepo
+	clonePath := basePath + "github.com/" + build.SourceRepo
 
 	// debug
 	fmt.Println(clonePath)
