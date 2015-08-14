@@ -93,7 +93,7 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ren.JSON(w, http.StatusOK, build)
 }
 
-// Clone run "git clone <repository_URL>" and "git checkout rebision"
+// Clone run "git clone <repository_URL>" and "git checkout revision"
 func gitClone(build schema.Build) error {
 	basePath := DefaultCloneBasePath
 	if _, err := os.Stat(basePath); err != nil {
