@@ -11,7 +11,7 @@ import (
 )
 
 // DefaultFilePath is default file path
-const DefaultFilePath = "/tmp/risu/"
+const DefaultFilePath = "/etc/risu/"
 
 // LocalFsRegistry is sharing path
 type LocalFsRegistry struct {
