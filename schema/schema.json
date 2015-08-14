@@ -38,10 +38,11 @@
             "string"
           ]
         },
-        "source_revision": {
-          "description": "git revision to use for build. (also you can use git tag/branch for this).",
+        "source_branch": {
+          "description": "git branch to use for build.",
           "required": "true,",
-          "example": "ada9ce1829fab49e605e5a563dbf91274f64e923",
+          "example": "master",
+          "default": "master",
           "type": [
             "string"
           ]
@@ -98,8 +99,8 @@
               "source_repo": {
                 "$ref": "#/definitions/build/definitions/source_repo"
               },
-              "source_revision": {
-                "$ref": "#/definitions/build/definitions/source_revision"
+              "source_branch": {
+                "$ref": "#/definitions/build/definitions/source_branch"
               },
               "name": {
                 "$ref": "#/definitions/build/definitions/name"
@@ -136,8 +137,8 @@
         "source_repo": {
           "$ref": "#/definitions/build/definitions/source_repo"
         },
-        "source_revision": {
-          "$ref": "#/definitions/build/definitions/source_revision"
+        "source_branch": {
+          "$ref": "#/definitions/build/definitions/source_branch"
         },
         "name": {
           "$ref": "#/definitions/build/definitions/name"
