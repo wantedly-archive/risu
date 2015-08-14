@@ -4,7 +4,21 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/wantedly/risu/schema"
 )
+
+func TestGitClone(t *testing.T) {
+	opts := schema.BuildCreateOpts{
+		SourceRepo: "wantedly/private-nginx-image-server",
+		Name:       "quay.io/wantedly/private-nginx-image-server:test",
+	}
+	build := schema.NewBuild(opts)
+	err := gitClone(build)
+	if err != nil {
+		t.Error(err)
+	}
+}
 
 func TestRootAccess(t *testing.T) {
 	response := httptest.NewRecorder()
