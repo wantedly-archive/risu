@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -26,12 +25,14 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	err := json.NewDecoder(r.Body).Decode(&opts)
 	if err != nil {
 		log.Fatal(err)
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
 	}
 
 	if opts.Dockerfile == "" {
 		opts.Dockerfile = "Dockerfile"
 	}
 
+	currentTime := time.Now()
 	build := schema.Build{
 		ID:             uuid.NewUUID(),
 		SourceRepo:     opts.SourceRepo,
@@ -39,15 +40,18 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Name:           opts.Name,
 		Dockerfile:     opts.Dockerfile,
 		Status:         "building",
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		CreatedAt:      currentTime,
+		UpdatedAt:      currentTime,
 	}
 
 	reg.Set(build)
+	err = reg.Set(build)
+	if err != nil {
+		log.Fatal(err)
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+	}
 
-	// debug code
-	builddata, err := reg.Get(build.ID)
-	fmt.Fprintln(w, builddata)
+	ren.JSON(w, http.StatusCreated, build)
 }
 
 func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -58,9 +62,9 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	builds, err := reg.List()
 	if err != nil {
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+	} else {
+		ren.JSON(w, http.StatusOK, builds)
 	}
-
-	ren.JSON(w, http.StatusOK, builds)
 }
 
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -69,11 +73,12 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	build, err := reg.Get(uuid)
 	if err != nil {
 		ren.JSON(w, http.StatusNotFound, map[string]string{"status": "not found"})
+	} else {
+		ren.JSON(w, http.StatusOK, build)
 	}
-	ren.JSON(w, http.StatusOK, build)
 }
 
-func main() {
+func setUpServer() *negroni.Negroni {
 	router := httprouter.New()
 	router.GET("/", root)
 	router.GET("/builds", index)
@@ -82,5 +87,10 @@ func main() {
 
 	n := negroni.Classic()
 	n.UseHandler(router)
+	return n
+}
+
+func main() {
+	n := setUpServer()
 	n.Run(":8080")
 }
