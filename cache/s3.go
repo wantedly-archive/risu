@@ -54,8 +54,8 @@ func NewS3Cache() Cache {
 }
 
 func (c *S3Cache) Get(key string) (string, error) {
-	inflateDir := inflateDirPath(c.cacheDir, key)
 	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
+	inflateDirPath := getInflateDirPath(c.cacheDir, key)
 
 	_, err := c.s3Client.HeadObject(
 		&s3.HeadObjectInput{
@@ -97,7 +97,7 @@ func (c *S3Cache) Get(key string) (string, error) {
 		return "", err
 	}
 
-	return inflateDir, nil
+	return inflateDirPath, nil
 }
 
 func (c *S3Cache) Put(key, directory string) error {

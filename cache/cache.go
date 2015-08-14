@@ -181,6 +181,6 @@ func getArchivedCacheFilePath(cacheDir, key string) string {
 	return cacheDir + string(filepath.Separator) + key + ".tar.gz"
 }
 
-func inflateDirPath(cacheDir, key string) string {
+func getInflateDirPath(cacheDir, key string) string {
 	return cacheDir + string(filepath.Separator) + key
 }
