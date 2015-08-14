@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"log"
 	"os"
 
 	"github.com/fsouza/go-dockerclient"
