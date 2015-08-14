@@ -10,11 +10,11 @@ import (
 	"code.google.com/p/go-uuid/uuid"
 	"github.com/codegangsta/negroni"
 	"github.com/julienschmidt/httprouter"
-	"github.com/libgit2/git2go"
 	"github.com/unrolled/render"
 
 	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
+	"github.com/wantedly/risu/shell"
 )
 
 const (
@@ -99,7 +99,7 @@ func gitClone(build schema.Build) error {
 	// debug
 	fmt.Println(clonePath)
 
-	_, err := git.Clone(cloneURL, clonePath, &git.CloneOptions{CheckoutBranch: build.SourceBranch})
+	_, err := shell.Command("git", "clone", cloneURL, clonePath)
 	if err != nil {
 		return err
 	}
