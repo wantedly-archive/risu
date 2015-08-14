@@ -66,16 +66,20 @@
 			"Rev": "6aacfd5ab513e34f7e64ea9627ab9670371b34e7"
 		},
 		{
+			"ImportPath": "github.com/libgit2/git2go",
+			"Rev": "3d15c877d8d34c4268a7455bc60129681fa09100"
+		},
+		{
 			"ImportPath": "github.com/ugorji/go/codec",
 			"Rev": "5abd4e96a45c386928ed2ca2a7ef63e2533e18ec"
 		},
 		{
-			"ImportPath": "github.com/vaughan0/go-ini",
-			"Rev": "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1"
-		},
-		{
 			"ImportPath": "github.com/unrolled/render",
 			"Rev": "83f2ba57c12cec399ef137457b1957e41ef0bbe8"
+		},
+		{
+			"ImportPath": "github.com/vaughan0/go-ini",
+			"Rev": "a98ad7ee00ec53921f08832bc06ecf7fd600e6a1"
 		}
 	]
 }

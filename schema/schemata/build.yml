@@ -23,10 +23,11 @@ definitions:
     example: "wantedly/risu"
     type:
     - string
-  source_revision:
-    description: git revision to use for build. (also you can use git tag/branch for this).
+  source_branch:
+    description: git branch to use for build.
     required: true,
-    example: "ada9ce1829fab49e605e5a563dbf91274f64e923"
+    example: "master"
+    default: "master"
     type:
     - string
   name:
@@ -69,8 +70,8 @@ links:
       "source_repo": {
         "$ref": "/schemata/build#/definitions/source_repo"
       },
-      "source_revision": {
-        "$ref": "/schemata/build#/definitions/source_revision"
+      "source_branch": {
+        "$ref": "/schemata/build#/definitions/source_branch"
       },
       "name": {
         "$ref": "/schemata/build#/definitions/name"
@@ -97,8 +98,8 @@ properties:
     "$ref": "/schemata/build#/definitions/id"
   source_repo:
     "$ref": "/schemata/build#/definitions/source_repo"
-  source_revision:
-    "$ref": "/schemata/build#/definitions/source_revision"
+  source_branch:
+    "$ref": "/schemata/build#/definitions/source_branch"
   name:
     "$ref": "/schemata/build#/definitions/name"
   dockerfile:
