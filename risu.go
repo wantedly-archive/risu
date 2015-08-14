@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"code.google.com/p/go-uuid/uuid"
@@ -16,6 +17,7 @@ import (
 )
 
 var ren = render.New()
+var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
@@ -43,7 +45,6 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		UpdatedAt:      currentTime,
 	}
 
-	reg := registry.NewRegistry("localfs", "")
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)
@@ -58,7 +59,6 @@ func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	reg := registry.NewRegistry("localfs", "")
 	builds, err := reg.List()
 	if err != nil {
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
@@ -70,7 +70,6 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id := ps.ByName("id")
 	uuid := uuid.Parse(id)
-	reg := registry.NewRegistry("localfs", "")
 	build, err := reg.Get(uuid)
 	if err != nil {
 		ren.JSON(w, http.StatusNotFound, map[string]string{"status": "not found"})
