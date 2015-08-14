@@ -131,6 +131,7 @@ func setUpServer() *negroni.Negroni {
 
 func main() {
 	if os.Getenv("GITHUB_ACCESS_TOKEN") == "" {
+		log.Fatal("Please provide 'GITHUB_ACCESS_TOKEN' through environment")
 		os.Exit(1)
 	}
 	n := setUpServer()
