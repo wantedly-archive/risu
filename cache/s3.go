@@ -11,12 +11,9 @@ import (
 
 type S3Cache struct {
 	cacheBucket string
+	cacheDir    string
 	s3Client    *s3.S3
 }
-
-const (
-	TemporaryCacheDir = "/tmp/risu/cache"
-)
 
 func NewS3Cache() Cache {
 	if os.Getenv("AWS_ACCESS_KEY_ID") == "" || os.Getenv("AWS_SECRET_ACCESS_KEY") == "" || os.Getenv("AWS_REGION") == "" {
@@ -25,6 +22,16 @@ func NewS3Cache() Cache {
 	}
 
 	s3Client := s3.New(nil)
+
+	var cacheDir string
+
+	if os.Getenv("RISU_CACHE_DIR") != "" {
+		cacheDir = os.Getenv("RISU_CACHE_DIR")
+	}
+
+	if cacheDir == "" {
+		cacheDir = DefaultCacheDir
+	}
 
 	if os.Getenv("RISU_CACHE_BUCKET") == "" {
 		// TODO: raise error if RISU_CACHE_BUCKET is not set
@@ -43,12 +50,12 @@ func NewS3Cache() Cache {
 		return nil
 	}
 
-	return &S3Cache{cacheBucket, s3Client}
+	return &S3Cache{cacheBucket, cacheDir, s3Client}
 }
 
 func (c *S3Cache) Get(key string) (string, error) {
-	temporaryCache := cacheFilePath(DefaultCacheDir, key)
-	inflateDir := inflateDirPath(DefaultCacheDir, key)
+	temporaryCache := cacheFilePath(c.cacheDir, key)
+	inflateDir := inflateDirPath(c.cacheDir, key)
 
 	_, err := c.s3Client.HeadObject(
 		&s3.HeadObjectInput{
@@ -94,7 +101,7 @@ func (c *S3Cache) Get(key string) (string, error) {
 }
 
 func (c *S3Cache) Put(key, directory string) error {
-	temporaryCache := cacheFilePath(DefaultCacheDir, key)
+	temporaryCache := cacheFilePath(c.cacheDir, key)
 
 	if err := DeflateTarGz(temporaryCache, directory); err != nil {
 		return err

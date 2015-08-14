@@ -15,6 +15,10 @@ type Cache interface {
 	Put(key, directory string) error
 }
 
+const (
+	DefaultCacheDir = "/tmp/risu/cache"
+)
+
 func NewCache(backend string) Cache {
 	switch backend {
 	case "local":

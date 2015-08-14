@@ -8,10 +8,6 @@ type LocalFsCache struct {
 	cacheDir string
 }
 
-const (
-	DefaultCacheDir = "/tmp/risu/cache"
-)
-
 func NewLocalFsCache() Cache {
 	var cacheDir string
 
