@@ -16,6 +16,10 @@ import (
 	"github.com/wantedly/risu/schema"
 )
 
+const (
+	DefaultCacheDir = "/var/risu/cache"
+)
+
 var ren = render.New()
 var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
 
