@@ -51,7 +51,20 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
 		return
 	}
-	ren.JSON(w, http.StatusCreated, build)
+	ren.JSON(w, http.StatusAccepted, build)
+
+	go func() {
+		if err := gitClone(build); err != nil {
+			return
+		}
+
+		if err := dockerBuild(build); err != nil {
+			return
+		}
+
+		go dockerPush(build)
+		go pushCache(build)
+	}()
 }
 
 func root(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -76,6 +89,26 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	ren.JSON(w, http.StatusOK, build)
+}
+
+func gitClone(build schema.Build) error {
+	// TODO (@koudaii)
+	return nil
+}
+
+func dockerBuild(build schema.Build) error {
+	// TODO (@dtan4)
+	return nil
+}
+
+func dockerPush(build schema.Build) error {
+	// TODO (@koudaii)
+	return nil
+}
+
+func pushCache(build schema.Build) error {
+	// TODO (@dtan4)
+	return nil
 }
 
 func setUpServer() *negroni.Negroni {
