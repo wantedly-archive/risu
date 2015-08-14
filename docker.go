@@ -15,6 +15,7 @@ const (
 )
 
 func DockerBuild(build *schema.Build) error {
+	clonePath := SourceBasePath + build.SourceRepo
 	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
 	inflatedCachePath, err := cache.Get(build.ID.String())
 
@@ -51,7 +52,7 @@ func DockerBuild(build *schema.Build) error {
 		ForceRmTmpContainer: true,
 		Dockerfile:          build.Dockerfile,
 		OutputStream:        outputbuf,
-		ContextDir:          "", // TODO: Set `git clone` destination
+		ContextDir:          clonePath, // TODO: Set `git clone` destination
 	}
 
 	if err := client.BuildImage(opts); err != nil {
