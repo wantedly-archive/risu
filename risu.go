@@ -24,7 +24,7 @@ import (
 const (
 	CacheBasePath         = "/var/risu/cache"
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
-	SourceBasePath        = "/var/risu/src/github.com/"
+	DefaultSourceBaseDir  = "/var/risu/src/github.com/"
 )
 
 var ren = render.New()
@@ -140,8 +140,8 @@ func dockerPush(build schema.Build) error {
 		return err
 	}
 
-	nameTag := strings.Split(build.Name, ":")
-	dockerRegistry := strings.Split(build.Name, "/")
+	nameTag := strings.Split(build.ImageName, ":")
+	dockerRegistry := strings.Split(build.ImageName, "/")
 
 	outputbuf := bytes.NewBuffer(nil)
 	// push build image
