@@ -154,20 +154,21 @@ func dockerPush(build schema.Build) error {
 	}
 
 	nametag := strings.Split(build.Name, ":")
+	slashedname := strings.toSlash(build.Name)
 
 	outputbuf := bytes.NewBuffer(nil)
 	// push build image
 	pushOpts := docker.PushImageOptions{
 		Name:         nametag[0],
 		Tag:          nametag[1],
-		Registry:     "quay.io",
+		Registry:     slashedname[0],
 		OutputStream: outputbuf,
 	}
 	authConfig := docker.AuthConfiguration{
-		Username:      "spesnova",
-		Password:      "XXXXXXXXXXXXXXXXXXXXX",
-		Email:         "spesnova@gmail.com",
-		ServerAddress: "quay.io",
+		Username:      os.Getenv("USER_NAME"),
+		Password:      os.Getenv("USER_PASSWORD"),
+		Email:         os.Getenv("USER_EMAIL"),
+		ServerAddress: slashedname[0],
 	}
 	if err := client.PushImage(pushOpts, authConfig); err != nil {
 		return err
