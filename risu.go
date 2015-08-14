@@ -22,8 +22,10 @@ const (
 	DefaultSourceBaseDir = "/var/risu/src/github.com/"
 )
 
-var ren = render.New()
-var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
+var (
+	ren = render.New()
+	reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
+)
 
 func loadEnv() {
 	err := godotenv.Load()

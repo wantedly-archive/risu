@@ -18,6 +18,8 @@ const (
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
 )
 
+var dockerClient *docker.Client
+
 func dockerBuild(build schema.Build) error {
 	clonePath := DefaultSourceBaseDir + build.SourceRepo
 
@@ -25,17 +27,7 @@ func dockerBuild(build schema.Build) error {
 		return err
 	}
 
-	dockerEndpoint := os.Getenv("DOCKER_HOST")
-
-	if dockerEndpoint == "" {
-		dockerEndpoint = DefaultDockerEndpoint
-	}
-
-	client, err := docker.NewClient(dockerEndpoint)
-
-	if err != nil {
-		return err
-	}
+	docker := getDockerClient()
 
 	outputbuf := bytes.NewBuffer(nil)
 	opts := docker.BuildImageOptions{
@@ -57,22 +49,7 @@ func dockerBuild(build schema.Build) error {
 }
 
 func dockerPush(build schema.Build) error {
-
-	var dockerEndpoint string
-
-	if os.Getenv("DOCKER_HOST") != "" {
-		dockerEndpoint = os.Getenv("DOCKER_HOST")
-	}
-
-	if dockerEndpoint == "" {
-		dockerEndpoint = DefaultDockerEndpoint
-	}
-
-	client, err := docker.NewClient(dockerEndpoint)
-
-	if err != nil {
-		return err
-	}
+	docker := getDockerClient()
 
 	dockerImageName := strings.Split(build.ImageName, ":")[0]
 	dockerImageTag := strings.Split(build.ImageName, ":")[1]
@@ -130,4 +107,23 @@ func getCacheKey(text string) string {
 	hasher.Write([]byte(text))
 
 	return hex.EncodeToString(hasher.Sum(nil))[0:12]
+}
+
+func getDockerClient() (*docker.Client, error) {
+	if dockerClient != nil {
+		return dockerClient, nil
+	}
+
+	dockerEndpoint := os.Getenv("DOCKER_HOST")
+
+	if dockerEndpoint == "" {
+		dockerEndpoint = DefaultDockerEndpoint
+	}
+
+	dockerClient, err := docker.NewClient(dockerEndpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return dockerClient, nil
 }
