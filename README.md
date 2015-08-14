@@ -101,7 +101,7 @@ $ docker run \
 $ docker run \
     --name risu \
     -e GITHUB_ACCESS_TOKEN=XXXXXXXXXXXXXXXXXXXXXX \
-    -e CACHE_BACKEND=etcd \
+    -e CACHE_BACKEND=s3 \
     -e AWS_ACCESS_KEY_ID=XXXXXXXXXXXXXXXXXXXX \
     -e AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
     -e AWS_REGION=xx-yyyy-0 \
