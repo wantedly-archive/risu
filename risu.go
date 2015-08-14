@@ -97,7 +97,9 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 // Clone run "git clone <repository_URL>" and "git checkout branch"
 func checkoutGitRepository(build schema.Build, dir string) error {
 	if _, err := os.Stat(dir); err != nil {
-		os.MkdirAll(dir, 0755)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	// htpps://<token>@github.com/<SourceRepo>.git
