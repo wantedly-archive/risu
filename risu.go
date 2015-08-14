@@ -42,7 +42,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	build := schema.NewBuild(opts)
+	build := schema.NewBuild(&opts)
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)

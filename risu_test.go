@@ -17,7 +17,7 @@ func TestCheckoutGitRepository(t *testing.T) {
 		SourceBranch: "patched-small-light",
 		ImageName:    "quay.io/wantedly/private-nginx-image-server:test",
 	}
-	build := schema.NewBuild(opts)
+	build := schema.NewBuild(&opts)
 	err := checkoutGitRepository(build, "/tmp/risu/src/github.com/")
 	if err != nil {
 		t.Error(err)
