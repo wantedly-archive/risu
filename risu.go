@@ -30,6 +30,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		opts.Dockerfile = "Dockerfile"
 	}
 
+	currentTime := time.Now()
 	build := schema.Build{
 		ID:             uuid.NewUUID(),
 		SourceRepo:     opts.SourceRepo,
@@ -37,8 +38,8 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		Name:           opts.Name,
 		Dockerfile:     opts.Dockerfile,
 		Status:         "building",
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		CreatedAt:      currentTime,
+		UpdatedAt:      currentTime,
 	}
 
 	reg := registry.NewRegistry("localfs", "")
