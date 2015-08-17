@@ -159,11 +159,11 @@ func addCacheToSrcRepo(build schema.Build, clonePath string) error {
 		return err
 	}
 
-	if inflatedCachePath != "" {
-		for _, cacheDirectory := range build.CacheDirectories {
-			cachePath := inflatedCachePath + string(filepath.Separator) + cacheDirectory["source"]
-			sourcePath := clonePath + string(filepath.Separator) + cacheDirectory["source"]
+	for _, cacheDirectory := range build.CacheDirectories {
+		cachePath := inflatedCachePath + string(filepath.Separator) + cacheDirectory["source"]
+		sourcePath := clonePath + string(filepath.Separator) + cacheDirectory["source"]
 
+		if inflatedCachePath != "" {
 			if _, err := os.Stat(sourcePath); err == nil {
 				if e := os.RemoveAll(sourcePath); e != nil {
 					return e
@@ -172,6 +172,10 @@ func addCacheToSrcRepo(build schema.Build, clonePath string) error {
 
 			if err := os.Rename(cachePath, sourcePath); err != nil {
 				return err
+			}
+		} else {
+			if _, err := os.Stat(sourcePath); err != nil {
+				os.MkdirAll(sourcePath, 0755)
 			}
 		}
 	}
