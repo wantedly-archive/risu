@@ -54,7 +54,7 @@ definitions:
     items:
       type: object
   status:
-    description: status of build. one of "failed" or "building" or "succeeded"
+    description: status of build. one of "building" or "build completed" or "failed to build" or "pushing", "push completed" or "failed to push"
     readOnly: true
     example: "succeeded"
     type:

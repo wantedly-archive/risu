@@ -14,7 +14,7 @@ A build represents an individual build job for docker image
 | **image_name** | *string* | a repository name (and optionally a tag) to apply to the resulting image in case of success. | `"quay.io/wantedly/risu:latest"` |
 | **dockerfile** | *string* | path within the build context to the Dockerfile<br/> **default:** `"Dockerfile"` | `"Dockerfile.dev"` |
 | **cache_directories** | *array* | directory paths that you want to cache | `[{"source":"vendor/bundle","container":"/app/vendor/bundle"},{"source":"vendor/assets","container":"/app/vendor/assets"}]` |
-| **status** | *string* | status of build. one of "failed" or "building" or "succeeded" | `"succeeded"` |
+| **status** | *string* | status of build. one of "building" or "build completed" or "failed to build" or "pushing", "push completed" or "failed to push" | `"succeeded"` |
 | **created_at** | *date-time* | when build was created | `"2015-01-01T12:00:00Z"` |
 | **updated_at** | *date-time* | when build was updated | `"2015-01-01T12:00:00Z"` |
 
