@@ -98,7 +98,7 @@ func dockerCopy(build schema.Build) (string, error) {
 			}
 
 			buffer := new(bytes.Buffer)
-			outPath := saveBaseDir + header.Name
+			outPath := filepath.Join(saveBaseDir, filepath.Dir(cacheDirectory["source"]), header.Name)
 
 			switch header.Typeflag {
 			case tar.TypeDir:
