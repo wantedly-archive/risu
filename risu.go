@@ -44,8 +44,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	build := schema.NewBuild(&opts)
-	err = reg.Set(build)
+	build, err := reg.Create(opts)
 	if err != nil {
 		log.Fatal(err)
 		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})

@@ -7,6 +7,7 @@ import (
 )
 
 type Registry interface {
+	Create(opts schema.BuildCreateOpts) (schema.Build, error)
 	Set(build schema.Build) error
 	Get(id uuid.UUID) (schema.Build, error)
 	List() ([]schema.Build, error)
