@@ -22,8 +22,10 @@ const (
 	DefaultSourceBaseDir = "/var/risu/src/github.com/"
 )
 
-var ren = render.New()
-var reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
+var (
+	ren = render.New()
+	reg = registry.NewRegistry(os.Getenv("REGISTRY_BACKEND"), os.Getenv("REGISTRY_ENDPOINT"))
+)
 
 func loadEnv() {
 	err := godotenv.Load()
@@ -42,7 +44,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	build := schema.NewBuild(opts)
+	build := schema.NewBuild(&opts)
 	err = reg.Set(build)
 	if err != nil {
 		log.Fatal(err)

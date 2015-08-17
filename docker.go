@@ -21,6 +21,8 @@ const (
 	DefaultDockerEndpoint = "unix:///var/run/docker.sock"
 )
 
+var dockerClient *docker.Client
+
 func dockerBuild(build schema.Build) error {
 	clonePath := DefaultSourceBaseDir + build.SourceRepo
 
@@ -28,13 +30,7 @@ func dockerBuild(build schema.Build) error {
 		return err
 	}
 
-	dockerEndpoint := os.Getenv("DOCKER_HOST")
-
-	if dockerEndpoint == "" {
-		dockerEndpoint = DefaultDockerEndpoint
-	}
-
-	client, err := docker.NewClient(dockerEndpoint)
+	client, err := getDockerClient()
 
 	if err != nil {
 		return err
@@ -60,13 +56,7 @@ func dockerBuild(build schema.Build) error {
 }
 
 func dockerCopy(build schema.Build) (string, error) {
-	dockerEndpoint := os.Getenv("DOCKER_HOST")
-
-	if dockerEndpoint == "" {
-		dockerEndpoint = DefaultDockerEndpoint
-	}
-
-	client, err := docker.NewClient(dockerEndpoint)
+	client, err := getDockerClient()
 
 	if err != nil {
 		return "", err
@@ -132,17 +122,7 @@ func dockerCopy(build schema.Build) (string, error) {
 }
 
 func dockerPush(build schema.Build) error {
-	var dockerEndpoint string
-
-	if os.Getenv("DOCKER_HOST") != "" {
-		dockerEndpoint = os.Getenv("DOCKER_HOST")
-	}
-
-	if dockerEndpoint == "" {
-		dockerEndpoint = DefaultDockerEndpoint
-	}
-
-	client, err := docker.NewClient(dockerEndpoint)
+	client, err := getDockerClient()
 
 	if err != nil {
 		return err
@@ -265,4 +245,23 @@ func disposeContainer(client *docker.Client, container *docker.Container) error 
 			RemoveVolumes: false,
 			Force:         true,
 		})
+}
+
+func getDockerClient() (*docker.Client, error) {
+	if dockerClient != nil {
+		return dockerClient, nil
+	}
+
+	dockerEndpoint := os.Getenv("DOCKER_HOST")
+
+	if dockerEndpoint == "" {
+		dockerEndpoint = DefaultDockerEndpoint
+	}
+
+	dockerClient, err := docker.NewClient(dockerEndpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	return dockerClient, nil
 }

@@ -27,7 +27,7 @@ type BuildCreateOpts struct {
 }
 
 // NewBuild creates new build struct
-func NewBuild(opts BuildCreateOpts) Build {
+func NewBuild(opts *BuildCreateOpts) Build {
 	if opts.SourceBranch == "" {
 		opts.SourceBranch = "master"
 	}
