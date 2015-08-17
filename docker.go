@@ -239,7 +239,7 @@ func runContainer(client *docker.Client, build schema.Build) (*docker.Container,
 }
 
 func disposeContainer(client *docker.Client, container *docker.Container) error {
-	if err := client.StopContainer(container.ID, 30); err != nil {
+	if err := client.StopContainer(container.ID, 1); err != nil {
 		return err
 	}
 
