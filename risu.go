@@ -123,9 +123,8 @@ func refreshCache(build schema.Build) error {
 		return err
 	}
 
-	cacheSavedDirectories := []string{saveBaseDir}
 
-	if err = putCache(build, cacheSavedDirectories); err != nil {
+	if err = putCache(build, saveBaseDir); err != nil {
 		return err
 	}
 

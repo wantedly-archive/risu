@@ -12,7 +12,7 @@ import (
 
 type Cache interface {
 	Get(key string) (string, error)
-	Put(key string, directories []string) error
+	Put(key, directory string) error
 }
 
 const (
@@ -31,7 +31,7 @@ func NewCache(backend string) Cache {
 	}
 }
 
-func DeflateTarGz(tarGzPath string, deflateDirs []string) error {
+func DeflateTarGz(tarGzPath, deflateDir string) error {
 	tarFile, err := os.Create(tarGzPath)
 
 	if err != nil {
@@ -45,15 +45,13 @@ func DeflateTarGz(tarGzPath string, deflateDirs []string) error {
 	tarGzWriter := tar.NewWriter(gzipWriter)
 	defer tarGzWriter.Close()
 
-	for _, deflateDir := range deflateDirs {
-		deflateDir, err = filepath.Abs(deflateDir)
+	deflateDir, err = filepath.Abs(deflateDir)
 
-		if err != nil {
-			return err
-		}
-
-		walkDir(deflateDir, deflateDir, tarGzWriter)
+	if err != nil {
+		return err
 	}
+
+	walkDir(deflateDir, deflateDir, tarGzWriter)
 
 	return nil
 }

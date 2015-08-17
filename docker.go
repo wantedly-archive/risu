@@ -183,10 +183,10 @@ func addCacheToSrcRepo(build schema.Build, clonePath string) error {
 	return nil
 }
 
-func putCache(build schema.Build, cacheSavedDirectories []string) error {
+func putCache(build schema.Build, cacheSavedDirectory string) error {
 	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
 
-	if err := cache.Put(getCacheKey(build.SourceRepo), cacheSavedDirectories); err != nil {
+	if err := cache.Put(getCacheKey(build.SourceRepo), cacheSavedDirectory); err != nil {
 		return err
 	}
 
