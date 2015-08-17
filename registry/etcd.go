@@ -45,7 +45,7 @@ func (r *EtcdRegistry) Create(opts schema.BuildCreateOpts) (schema.Build, error)
 	}
 
 	key := path.Join(r.keyPrefix, build.ID.String())
-	_, err = r.etcd.Create(key, string(j), 0)
+	_, err = r.etcd.Create(key, string(j), DefaultExpireSeconds)
 	if err != nil {
 		return build, err
 	}
@@ -61,7 +61,7 @@ func (r *EtcdRegistry) Set(build schema.Build, opts schema.BuildUpdateOpts) erro
 	}
 
 	key := path.Join(r.keyPrefix, build.ID.String())
-	_, err = r.etcd.Set(key, string(j), 0)
+	_, err = r.etcd.Set(key, string(j), DefaultExpireSeconds)
 	if err != nil {
 		return err
 	}
