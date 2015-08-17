@@ -57,7 +57,8 @@ func (r *LocalFsRegistry) Create(opts schema.BuildCreateOpts) (schema.Build, err
 }
 
 // Set stores the build data to a json file. file name is "/tmp/risu/<UUID>.json".
-func (r *LocalFsRegistry) Set(build schema.Build) error {
+func (r *LocalFsRegistry) Set(build schema.Build, opts schema.BuildUpdateOpts) error {
+	build = schema.UpdateBuild(build, &opts)
 	b, err := json.Marshal(build)
 	if err != nil {
 		return err

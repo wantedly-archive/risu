@@ -53,7 +53,8 @@ func (r *EtcdRegistry) Create(opts schema.BuildCreateOpts) (schema.Build, error)
 	return build, nil
 }
 
-func (r *EtcdRegistry) Set(build schema.Build) error {
+func (r *EtcdRegistry) Set(build schema.Build, opts schema.BuildUpdateOpts) error {
+	build = schema.UpdateBuild(build, &opts)
 	j, err := marshal(build)
 	if err != nil {
 		return err

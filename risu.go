@@ -58,11 +58,28 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		}
 
 		if err := dockerBuild(build); err != nil {
+			if err := reg.Set(build, schema.BuildUpdateOpts{Status: "failed to build"}); err != nil {
+				log.Print(err)
+			}
 			return
 		}
+		if err := reg.Set(build, schema.BuildUpdateOpts{Status: "build completed and pushing"}); err != nil {
+			log.Print(err)
+		}
 
-		go dockerPush(build)
-		go refreshCache(build)
+		if err := dockerPush(build); err != nil {
+			if err := reg.Set(build, schema.BuildUpdateOpts{Status: "failed to push"}); err != nil {
+				log.Print(err)
+			}
+			return
+		}
+		if err := reg.Set(build, schema.BuildUpdateOpts{Status: "build completed and pushed"}); err != nil {
+			log.Print(err)
+		}
+
+		if err := refreshCache(build); err != nil {
+			return
+		}
 	}()
 }
 
