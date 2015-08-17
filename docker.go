@@ -55,7 +55,7 @@ func dockerBuild(build schema.Build) error {
 	return nil
 }
 
-func dockerCopy(build schema.Build) (string, error) {
+func extractCache(build schema.Build) (string, error) {
 	client, err := getDockerClient()
 
 	if err != nil {

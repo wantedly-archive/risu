@@ -117,7 +117,7 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 }
 
 func refreshCache(build schema.Build) error {
-	saveBaseDir, err := dockerCopy(build)
+	saveBaseDir, err := extractCache(build)
 
 	if err != nil {
 		return err
