@@ -37,7 +37,24 @@ func NewEtcdRegistry(machines string) Registry {
 	return &EtcdRegistry{etcdClient, DefaultKeyPrefix}
 }
 
-func (r *EtcdRegistry) Set(build schema.Build) error {
+func (r *EtcdRegistry) Create(opts schema.BuildCreateOpts) (schema.Build, error) {
+	build := schema.NewBuild(&opts)
+	j, err := marshal(build)
+	if err != nil {
+		return build, err
+	}
+
+	key := path.Join(r.keyPrefix, build.ID.String())
+	_, err = r.etcd.Create(key, string(j), 0)
+	if err != nil {
+		return build, err
+	}
+
+	return build, nil
+}
+
+func (r *EtcdRegistry) Set(build schema.Build, opts schema.BuildUpdateOpts) error {
+	build = schema.UpdateBuild(build, &opts)
 	j, err := marshal(build)
 	if err != nil {
 		return err

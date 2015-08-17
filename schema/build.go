@@ -26,6 +26,10 @@ type BuildCreateOpts struct {
 	CacheDirectories []map[string]string `json:"cache_directories"`
 }
 
+type BuildUpdateOpts struct {
+	Status string `json:"status"`
+}
+
 // NewBuild creates new build struct
 func NewBuild(opts *BuildCreateOpts) Build {
 	if opts.SourceBranch == "" {
@@ -48,4 +52,16 @@ func NewBuild(opts *BuildCreateOpts) Build {
 		CreatedAt:        currentTime,
 		UpdatedAt:        currentTime,
 	}
+}
+
+func UpdateBuild(build Build, opts *BuildUpdateOpts) Build {
+	switch opts.Status {
+	case "building", "build completed and pushing", "failed to build", "build completed and pushed", "failed to push":
+		build.Status = opts.Status
+	default:
+		return build
+	}
+
+	build.UpdatedAt = time.Now()
+	return build
 }

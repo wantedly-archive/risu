@@ -33,8 +33,32 @@ func NewLocalFsRegistry(dir string) Registry {
 	return &LocalFsRegistry{dir}
 }
 
+func (r *LocalFsRegistry) Create(opts schema.BuildCreateOpts) (schema.Build, error) {
+	build := schema.NewBuild(&opts)
+	b, err := json.Marshal(build)
+	if err != nil {
+		return build, err
+	}
+
+	file, err := os.Create(r.dir + build.ID.String() + ".json")
+	if err != nil {
+		return build, err
+	}
+
+	defer file.Close()
+
+	buildData := []byte(string(b))
+
+	_, err = file.Write(buildData)
+	if err != nil {
+		return build, err
+	}
+	return build, nil
+}
+
 // Set stores the build data to a json file. file name is "/tmp/risu/<UUID>.json".
-func (r *LocalFsRegistry) Set(build schema.Build) error {
+func (r *LocalFsRegistry) Set(build schema.Build, opts schema.BuildUpdateOpts) error {
+	build = schema.UpdateBuild(build, &opts)
 	b, err := json.Marshal(build)
 	if err != nil {
 		return err
