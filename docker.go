@@ -72,6 +72,7 @@ func dockerCopy(build schema.Build) (string, error) {
 		return "", err
 	}
 
+	// docker run
 	container, err := client.CreateContainer(
 		docker.CreateContainerOptions{
 			Config: &docker.Config{
@@ -102,6 +103,11 @@ func dockerCopy(build schema.Build) (string, error) {
 		return "", err
 	}
 
+	if err = client.StartContainer(container.ID, &docker.HostConfig{}); err != nil {
+		return "", err
+	}
+
+	// docker cp
 	saveBaseDir := c.DefaultInflatedCacheDir + getCacheKey(build.SourceRepo) + "/"
 
 	for _, cacheDirectory := range build.CacheDirectories {
