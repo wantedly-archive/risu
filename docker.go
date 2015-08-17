@@ -150,6 +150,12 @@ func dockerCopy(build schema.Build) (string, error) {
 		}
 	}
 
+	cacheSavedDirectories := []string{saveBaseDir}
+
+	if err = putCache(build, cacheSavedDirectories); err != nil {
+		return "", err
+	}
+
 	// TODO: Stop & Remove container
 
 	return saveBaseDir, nil
@@ -218,6 +224,16 @@ func addCacheToSrcRepo(build schema.Build, clonePath string) error {
 				return err
 			}
 		}
+	}
+
+	return nil
+}
+
+func putCache(build schema.Build, cacheSavedDirectories []string) error {
+	cache := c.NewCache(os.Getenv("CACHE_BACKEND"))
+
+	if err := cache.Put(getCacheKey(build.SourceRepo), cacheSavedDirectories); err != nil {
+		return err
 	}
 
 	return nil
