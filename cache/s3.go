@@ -100,10 +100,10 @@ func (c *S3Cache) Get(key string) (string, error) {
 	return inflateDirPath, nil
 }
 
-func (c *S3Cache) Put(key, directory string) error {
+func (c *S3Cache) Put(key string, directories []string) error {
 	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
 
-	if err := DeflateTarGz(archivedCacheFilePath, directory); err != nil {
+	if err := DeflateTarGz(archivedCacheFilePath, directories); err != nil {
 		return err
 	}
 

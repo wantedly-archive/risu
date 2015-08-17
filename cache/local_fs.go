@@ -41,8 +41,8 @@ func (c *LocalFsCache) Get(key string) (string, error) {
 	return inflateDirPath, nil
 }
 
-func (c *LocalFsCache) Put(key, directory string) error {
-	if err := DeflateTarGz(getArchivedCacheFilePath(c.cacheDir, key), directory); err != nil {
+func (c *LocalFsCache) Put(key string, directories []string) error {
+	if err := DeflateTarGz(getArchivedCacheFilePath(c.cacheDir, key), directories); err != nil {
 		return err
 	}
 
