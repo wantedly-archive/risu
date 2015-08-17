@@ -107,6 +107,8 @@ func dockerCopy(build schema.Build) (string, error) {
 		return "", err
 	}
 
+	defer disposeContainer(client, container)
+
 	// docker cp
 	saveBaseDir := c.DefaultInflatedCacheDir + getCacheKey(build.SourceRepo) + "/"
 
@@ -161,8 +163,6 @@ func dockerCopy(build schema.Build) (string, error) {
 	if err = putCache(build, cacheSavedDirectories); err != nil {
 		return "", err
 	}
-
-	// TODO: Stop & Remove container
 
 	return saveBaseDir, nil
 }
@@ -250,4 +250,17 @@ func getCacheKey(text string) string {
 	hasher.Write([]byte(text))
 
 	return hex.EncodeToString(hasher.Sum(nil))[0:12]
+}
+
+func disposeContainer(client *docker.Client, container *docker.Container) error {
+	if err := client.StopContainer(container.ID, 30); err != nil {
+		return err
+	}
+
+	return client.RemoveContainer(
+		docker.RemoveContainerOptions{
+			ID:            container.ID,
+			RemoveVolumes: false,
+			Force:         true,
+		})
 }
