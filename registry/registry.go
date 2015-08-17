@@ -6,6 +6,10 @@ import (
 	"github.com/wantedly/risu/schema"
 )
 
+const (
+	DefaultExpireSeconds = 60 * 60 * 24 * 5 // 5 days
+)
+
 type Registry interface {
 	Set(build schema.Build) error
 	Get(id uuid.UUID) (schema.Build, error)
