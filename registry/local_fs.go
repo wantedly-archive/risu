@@ -121,9 +121,9 @@ func deleteExpiredItem(path string, f os.FileInfo, _ error) error {
 		return nil
 	}
 
-	currentTime := time.Now()
+	elapsedSeconds := time.Now().Sub(f.ModTime()).Seconds()
 
-	if currentTime.Sub(f.ModTime()).Seconds() > DefaultExpireSeconds {
+	if elapsedSeconds > DefaultExpireSeconds {
 		if err := os.Remove(path); err != nil {
 			return err
 		}
