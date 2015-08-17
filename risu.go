@@ -118,9 +118,6 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 	// htpps://<token>@github.com/<SourceRepo>.git
 	cloneURL := "https://" + os.Getenv("GITHUB_ACCESS_TOKEN") + "@github.com/" + build.SourceRepo + ".git"
 
-	// debug
-	fmt.Println(cloneURL)
-
 	clonePath := dir + build.SourceRepo
 
 	// debug
@@ -139,7 +136,6 @@ func refreshCache(build schema.Build) error {
 	if err != nil {
 		return err
 	}
-
 
 	if err = putCache(build, saveBaseDir); err != nil {
 		return err
