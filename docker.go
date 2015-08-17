@@ -48,7 +48,7 @@ func dockerBuild(build schema.Build) error {
 		ContextDir:          clonePath,
 	}
 
-	if err := client.BuildImage(opts); err != nil {
+	if err = client.BuildImage(opts); err != nil {
 		return err
 	}
 
