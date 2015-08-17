@@ -42,7 +42,14 @@ func (c *LocalFsCache) Get(key string) (string, error) {
 }
 
 func (c *LocalFsCache) Put(key, directory string) error {
-	if err := DeflateTarGz(getArchivedCacheFilePath(c.cacheDir, key), directory); err != nil {
+	temporaryCacheDir := getArchivedCacheFilePath("/tmp/risu/", key)
+	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
+
+	if err := DeflateTarGz(temporaryCacheDir, directory); err != nil {
+		return err
+	}
+
+	if err := os.Rename(temporaryCacheDir, archivedCacheFilePath); err != nil {
 		return err
 	}
 
