@@ -80,7 +80,6 @@ func dockerCopy(build schema.Build) (string, error) {
 
 	defer disposeContainer(client, container)
 
-	// docker cp
 	saveBaseDir := c.DefaultInflatedCacheDir + getCacheKey(build.SourceRepo) + "/"
 
 	for _, cacheDirectory := range build.CacheDirectories {
@@ -127,12 +126,6 @@ func dockerCopy(build schema.Build) (string, error) {
 				}
 			}
 		}
-	}
-
-	cacheSavedDirectories := []string{saveBaseDir}
-
-	if err = putCache(build, cacheSavedDirectories); err != nil {
-		return "", err
 	}
 
 	return saveBaseDir, nil
