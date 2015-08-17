@@ -63,7 +63,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		}
 
 		go dockerPush(build)
-		go pushCache(build)
+		go refreshCache(build)
 	}()
 }
 
@@ -116,8 +116,18 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 	return nil
 }
 
-func pushCache(build schema.Build) error {
-	// TODO (@dtan4)
+func refreshCache(build schema.Build) error {
+	saveBaseDir, err := extractCache(build)
+
+	if err != nil {
+		return err
+	}
+
+
+	if err = putCache(build, saveBaseDir); err != nil {
+		return err
+	}
+
 	return nil
 }
 

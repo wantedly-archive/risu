@@ -101,13 +101,13 @@ func (c *S3Cache) Get(key string) (string, error) {
 }
 
 func (c *S3Cache) Put(key, directory string) error {
-	archivedCacheFilePath := getArchivedCacheFilePath(c.cacheDir, key)
+	temporaryCacheDir := getArchivedCacheFilePath("/tmp/risu/", key)
 
-	if err := DeflateTarGz(archivedCacheFilePath, directory); err != nil {
+	if err := DeflateTarGz(temporaryCacheDir, directory); err != nil {
 		return err
 	}
 
-	file, err := os.Open(archivedCacheFilePath)
+	file, err := os.Open(temporaryCacheDir)
 
 	if err != nil {
 		return err

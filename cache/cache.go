@@ -179,9 +179,9 @@ func writeTarGz(filePath, baseDir string, tarGzWriter *tar.Writer, fileInfo os.F
 }
 
 func getArchivedCacheFilePath(cacheDir, key string) string {
-	return cacheDir + key + ".tar.gz"
+	return filepath.Join(cacheDir, key+".tar.gz")
 }
 
 func getInflateDirPath(cacheDir, key string) string {
-	return cacheDir + key
+	return filepath.Join(cacheDir, key)
 }
