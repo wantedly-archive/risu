@@ -129,6 +129,7 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 	shell.Command("git", "clone", cloneURL, clonePath)
 	shell.CommandInDir(clonePath, "git", "fetch", "origin", build.SourceBranch)
 	shell.CommandInDir(clonePath, "git", "checkout", "remotes/origin/"+build.SourceBranch, "-f")
+	shell.CommandInDir(clonePath, "git", "submodule", "update", "--init")
 	return nil
 }
 
