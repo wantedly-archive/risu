@@ -6,6 +6,10 @@ import (
 	"github.com/wantedly/risu/schema"
 )
 
+const (
+	DefaultExpireSeconds = 60 * 60 * 24 * 5 // 5 days
+)
+
 type Registry interface {
 	Create(opts schema.BuildCreateOpts) (schema.Build, error)
 	Set(build schema.Build, opts schema.BuildUpdateOpts) error

@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"time"
 
 	"code.google.com/p/go-uuid/uuid"
 
@@ -30,6 +32,17 @@ func NewLocalFsRegistry(dir string) Registry {
 			log.Fatal(err)
 		}
 	}
+
+	go func(dir string) {
+		for {
+			if err := cleanUpItems(dir); err != nil {
+				log.Fatal(err)
+			}
+
+			time.Sleep(10 * time.Second)
+		}
+	}(dir)
+
 	return &LocalFsRegistry{dir}
 }
 
@@ -125,4 +138,28 @@ func (r *LocalFsRegistry) List() ([]schema.Build, error) {
 	}
 
 	return builds, nil
+}
+
+func deleteExpiredItem(path string, f os.FileInfo, _ error) error {
+	if f.IsDir() {
+		return nil
+	}
+
+	elapsedSeconds := time.Now().Sub(f.ModTime()).Seconds()
+
+	if elapsedSeconds > DefaultExpireSeconds {
+		if err := os.Remove(path); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func cleanUpItems(dir string) error {
+	if err := filepath.Walk(dir, deleteExpiredItem); err != nil {
+		return err
+	}
+
+	return nil
 }
