@@ -27,7 +27,10 @@ func dockerBuild(build schema.Build) error {
 		return err
 	}
 
-	docker := getDockerClient()
+	client, err := getDockerClient()
+	if err != nil {
+		return err
+	}
 
 	outputbuf := bytes.NewBuffer(nil)
 	opts := docker.BuildImageOptions{
@@ -41,7 +44,7 @@ func dockerBuild(build schema.Build) error {
 		ContextDir:          clonePath,
 	}
 
-	if err := client.BuildImage(opts); err != nil {
+	if err = client.BuildImage(opts); err != nil {
 		return err
 	}
 
@@ -49,7 +52,10 @@ func dockerBuild(build schema.Build) error {
 }
 
 func dockerPush(build schema.Build) error {
-	docker := getDockerClient()
+	client, err := getDockerClient()
+	if err != nil {
+		return nil
+	}
 
 	dockerImageName := strings.Split(build.ImageName, ":")[0]
 	dockerImageTag := strings.Split(build.ImageName, ":")[1]
