@@ -72,38 +72,9 @@ func dockerCopy(build schema.Build) (string, error) {
 		return "", err
 	}
 
-	// docker run
-	container, err := client.CreateContainer(
-		docker.CreateContainerOptions{
-			Config: &docker.Config{
-				Hostname:        "",
-				Domainname:      "",
-				User:            "",
-				AttachStdin:     false,
-				AttachStdout:    false,
-				AttachStderr:    false,
-				Tty:             false,
-				OpenStdin:       false,
-				StdinOnce:       false,
-				Env:             nil,
-				Cmd:             []string{"sleep", "3600"},
-				Entrypoint:      []string{},
-				Image:           build.ImageName,
-				Labels:          nil,
-				Volumes:         nil,
-				WorkingDir:      "",
-				NetworkDisabled: false,
-				MacAddress:      "",
-				ExposedPorts:    nil,
-			},
-			HostConfig: &docker.HostConfig{},
-		})
+	container, err := runContainer(client, build)
 
 	if err != nil {
-		return "", err
-	}
-
-	if err = client.StartContainer(container.ID, &docker.HostConfig{}); err != nil {
 		return "", err
 	}
 
@@ -250,6 +221,44 @@ func getCacheKey(text string) string {
 	hasher.Write([]byte(text))
 
 	return hex.EncodeToString(hasher.Sum(nil))[0:12]
+}
+
+func runContainer(client *docker.Client, build schema.Build) (*docker.Container, error) {
+	container, err := client.CreateContainer(
+		docker.CreateContainerOptions{
+			Config: &docker.Config{
+				Hostname:        "",
+				Domainname:      "",
+				User:            "",
+				AttachStdin:     false,
+				AttachStdout:    false,
+				AttachStderr:    false,
+				Tty:             false,
+				OpenStdin:       false,
+				StdinOnce:       false,
+				Env:             nil,
+				Cmd:             []string{"sleep", "3600"},
+				Entrypoint:      []string{},
+				Image:           build.ImageName,
+				Labels:          nil,
+				Volumes:         nil,
+				WorkingDir:      "",
+				NetworkDisabled: false,
+				MacAddress:      "",
+				ExposedPorts:    nil,
+			},
+			HostConfig: &docker.HostConfig{},
+		})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err = client.StartContainer(container.ID, &docker.HostConfig{}); err != nil {
+		return nil, err
+	}
+
+	return container, nil
 }
 
 func disposeContainer(client *docker.Client, container *docker.Container) error {
