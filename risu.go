@@ -115,7 +115,7 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func checkoutGitRepository(build schema.Build, dir string) error {
 	if _, err := os.Stat(dir); err != nil {
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			log.Fatal(err)
+			printLog(build, err.Error())
 		}
 	}
 
