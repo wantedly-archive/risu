@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -59,25 +58,30 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 		if err := dockerBuild(build); err != nil {
 			if err := reg.Set(build, schema.BuildUpdateOpts{Status: "failed to build"}); err != nil {
-				log.Print(err)
+				printLog(build, err.Error())
 			}
+
+			printLog(build, err.Error())
 			return
 		}
 		if err := reg.Set(build, schema.BuildUpdateOpts{Status: "build completed and pushing"}); err != nil {
-			log.Print(err)
+			printLog(build, err.Error())
 		}
 
 		if err := dockerPush(build); err != nil {
 			if err := reg.Set(build, schema.BuildUpdateOpts{Status: "failed to push"}); err != nil {
-				log.Print(err)
+				printLog(build, err.Error())
 			}
+
+			printLog(build, err.Error())
 			return
 		}
 		if err := reg.Set(build, schema.BuildUpdateOpts{Status: "build completed and pushed"}); err != nil {
-			log.Print(err)
+			printLog(build, err.Error())
 		}
 
 		if err := refreshCache(build); err != nil {
+			printLog(build, err.Error())
 			return
 		}
 	}()
@@ -111,7 +115,7 @@ func show(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func checkoutGitRepository(build schema.Build, dir string) error {
 	if _, err := os.Stat(dir); err != nil {
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			log.Fatal(err)
+			printLog(build, err.Error())
 		}
 	}
 
@@ -121,7 +125,7 @@ func checkoutGitRepository(build schema.Build, dir string) error {
 	clonePath := dir + build.SourceRepo
 
 	// debug
-	fmt.Println(clonePath)
+	printLog(build, clonePath)
 
 	shell.Command("git", "clone", cloneURL, clonePath)
 	shell.CommandInDir(clonePath, "git", "fetch", "origin", build.SourceBranch)
