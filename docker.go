@@ -52,7 +52,7 @@ func dockerBuild(build schema.Build) error {
 	opts := docker.BuildImageOptions{
 		Name:                build.ImageName,
 		NoCache:             false,
-		SuppressOutput:      true,
+		SuppressOutput:      false,
 		RmTmpContainer:      true,
 		ForceRmTmpContainer: true,
 		Dockerfile:          build.Dockerfile,
