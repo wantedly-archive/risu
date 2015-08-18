@@ -2,6 +2,7 @@ package main
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
@@ -36,7 +37,18 @@ func dockerBuild(build schema.Build) error {
 		return err
 	}
 
-	outputbuf := bytes.NewBuffer(nil)
+	logsReader, outputbuf := io.Pipe()
+
+	go func(reader io.Reader, b schema.Build) {
+		scanner := bufio.NewScanner(reader)
+		for scanner.Scan() {
+			printLog(b, scanner.Text())
+		}
+		if err := scanner.Err(); err != nil {
+			printLog(b, "There was an error with the scanner in attached container")
+		}
+	}(logsReader, build)
+
 	opts := docker.BuildImageOptions{
 		Name:                build.ImageName,
 		NoCache:             false,
