@@ -38,16 +38,7 @@ func dockerBuild(build schema.Build) error {
 	}
 
 	logsReader, outputbuf := io.Pipe()
-
-	go func(reader io.Reader, b schema.Build) {
-		scanner := bufio.NewScanner(reader)
-		for scanner.Scan() {
-			printLog(b, scanner.Text())
-		}
-		if err := scanner.Err(); err != nil {
-			printLog(b, "There was an error with the scanner in attached container")
-		}
-	}(logsReader, build)
+	go flushLogs(logsReader, build)
 
 	opts := docker.BuildImageOptions{
 		Name:                build.ImageName,
@@ -144,7 +135,9 @@ func dockerPush(build schema.Build) error {
 	dockerImageTag := strings.Split(build.ImageName, ":")[1]
 	dockerRegistry := strings.Split(build.ImageName, "/")[0]
 
-	outputbuf := bytes.NewBuffer(nil)
+	logsReader, outputbuf := io.Pipe()
+	go flushLogs(logsReader, build)
+
 	pushOpts := docker.PushImageOptions{
 		Name:         dockerImageName,
 		Tag:          dockerImageTag,
@@ -280,4 +273,14 @@ func getDockerClient() (*docker.Client, error) {
 	}
 
 	return dockerClient, nil
+}
+
+func flushLogs(logsReader io.Reader, build schema.Build) {
+	scanner := bufio.NewScanner(logsReader)
+	for scanner.Scan() {
+		printLog(build, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		printLog(build, "There was an error with the scanner in attached container")
+	}
 }
