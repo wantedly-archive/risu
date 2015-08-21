@@ -12,6 +12,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/unrolled/render"
 
+	"github.com/wantedly/risu/notifications"
 	"github.com/wantedly/risu/registry"
 	"github.com/wantedly/risu/schema"
 	"github.com/wantedly/risu/shell"
@@ -36,6 +37,7 @@ func loadEnv() {
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	defer r.Body.Close()
 	var opts schema.BuildCreateOpts
+
 	err := json.NewDecoder(r.Body).Decode(&opts)
 	if err != nil {
 		log.Fatal(err)
@@ -50,40 +52,54 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 	ren.JSON(w, http.StatusAccepted, build)
-
+	message := "Start build :" + build.SourceRepo
+	notifications.Push(message)
 	go func() {
 		if err := checkoutGitRepository(build, DefaultSourceBaseDir); err != nil {
+			notifications.Push(err.Error())
 			return
 		}
-
+		message = "Build image:" + build.SourceRepo
+		notifications.Push(message)
 		if err := dockerBuild(build); err != nil {
 			if err := reg.Set(build, schema.BuildUpdateOpts{Status: "failed to build"}); err != nil {
+				notifications.Push(err.Error())
 				printLog(build, err.Error())
 			}
-
+			notifications.Push(err.Error())
 			printLog(build, err.Error())
 			return
 		}
 		if err := reg.Set(build, schema.BuildUpdateOpts{Status: "build completed and pushing"}); err != nil {
+			notifications.Push(err.Error())
 			printLog(build, err.Error())
 		}
-
+		message = "Push image :" + build.SourceRepo
+		notifications.Push(message)
 		if err := dockerPush(build); err != nil {
 			if err := reg.Set(build, schema.BuildUpdateOpts{Status: "failed to push"}); err != nil {
+				notifications.Push(err.Error())
 				printLog(build, err.Error())
 			}
-
+			notifications.Push(err.Error())
 			printLog(build, err.Error())
 			return
 		}
 		if err := reg.Set(build, schema.BuildUpdateOpts{Status: "build completed and pushed"}); err != nil {
+			notifications.Push(err.Error())
 			printLog(build, err.Error())
 		}
 
+		message = "Update Cache :" + build.SourceRepo
+		notifications.Push(message)
 		if err := refreshCache(build); err != nil {
+			notifications.Push(err.Error())
 			printLog(build, err.Error())
 			return
 		}
+
+		message = "Finished build image :" + build.SourceRepo
+		notifications.Push(message)
 	}()
 }
 
