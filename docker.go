@@ -75,6 +75,13 @@ func extractCache(build schema.Build) (string, error) {
 
 	saveBaseDir := c.DefaultInflatedCacheDir + getCacheKey(build.SourceRepo) + "/"
 
+	// make directory
+	if _, err := os.Stat(c.DefaultInflatedCacheDir); err != nil {
+		if err = os.MkdirAll(c.DefaultInflatedCacheDir, 0755); err != nil {
+			return "", err
+		}
+	}
+
 	for _, cacheDirectory := range build.CacheDirectories {
 		outputbuf := bytes.NewBuffer(nil)
 
