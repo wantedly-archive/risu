@@ -38,15 +38,15 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var opts schema.BuildCreateOpts
 	err := json.NewDecoder(r.Body).Decode(&opts)
 	if err != nil {
-		log.Fatal(err)
-		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+		log.Println(err)
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error: " + err.Error()})
 		return
 	}
 
 	build, err := reg.Create(opts)
 	if err != nil {
-		log.Fatal(err)
-		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error"})
+		log.Println(err)
+		ren.JSON(w, http.StatusInternalServerError, map[string]string{"status": "internal server error: " + err.Error()})
 		return
 	}
 	ren.JSON(w, http.StatusAccepted, build)
