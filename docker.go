@@ -149,7 +149,7 @@ func dockerPush(build schema.Build) error {
 	} else {
 		tag := build.ImageName[idx+1:]
 
-		if !strings.Contains(tag, "/") {
+		if strings.Contains(tag, "/") {
 			dockerRegistry = strings.Split(build.ImageName, "/")[0]
 			dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
 			dockerImageTag = "latest"
