@@ -132,15 +132,25 @@ func extractCache(build schema.Build) (string, error) {
 }
 
 func dockerPush(build schema.Build) error {
+	var dockerImageName, dockerImageTag, dockerRegistry string
+
 	client, err := getDockerClient()
 
 	if err != nil {
 		return err
 	}
 
-	dockerImageName := strings.Split(build.ImageName, ":")[0]
-	dockerImageTag := strings.Split(build.ImageName, ":")[1]
-	dockerRegistry := strings.Split(build.ImageName, "/")[0]
+	n := strings.LastIndex(build.ImageName, ":")
+
+	if n < 0 {
+		dockerRegistry = strings.Split(build.ImageName, "/")[0]
+		dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
+		dockerImageTag = "latest"
+	} else {
+		dockerRegistry = strings.Split(build.ImageName[:n], "/")[0]
+		dockerImageName = strings.Join(strings.Split(build.ImageName[:n], "/")[1:], "/")
+		dockerImageTag = build.ImageName[n+1:]
+	}
 
 	logsReader, outputbuf := io.Pipe()
 	go flushLogs(logsReader, build)
