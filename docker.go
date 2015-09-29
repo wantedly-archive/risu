@@ -140,16 +140,16 @@ func dockerPush(build schema.Build) error {
 		return err
 	}
 
-	n := strings.LastIndex(build.ImageName, ":")
+	idx := strings.LastIndex(build.ImageName, ":")
 
-	if n < 0 {
+	if idx < 0 {
 		dockerRegistry = strings.Split(build.ImageName, "/")[0]
 		dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
 		dockerImageTag = "latest"
 	} else {
-		dockerRegistry = strings.Split(build.ImageName[:n], "/")[0]
-		dockerImageName = strings.Join(strings.Split(build.ImageName[:n], "/")[1:], "/")
-		dockerImageTag = build.ImageName[n+1:]
+		dockerRegistry = strings.Split(build.ImageName[:idx], "/")[0]
+		dockerImageName = strings.Join(strings.Split(build.ImageName[:idx], "/")[1:], "/")
+		dockerImageTag = build.ImageName[idx+1:]
 	}
 
 	logsReader, outputbuf := io.Pipe()
