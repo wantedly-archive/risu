@@ -107,7 +107,7 @@ func InflateTarGz(tarGzPath, inflateDir string) error {
 				return err
 			}
 
-			if err = ioutil.WriteFile(outPath, buffer.Bytes(), 0644); err != nil {
+			if err = ioutil.WriteFile(outPath, buffer.Bytes(), os.FileMode(header.Mode)); err != nil {
 				return err
 			}
 		}
