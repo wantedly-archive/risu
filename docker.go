@@ -147,9 +147,17 @@ func dockerPush(build schema.Build) error {
 		dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
 		dockerImageTag = "latest"
 	} else {
-		dockerRegistry = strings.Split(build.ImageName[:idx], "/")[0]
-		dockerImageName = strings.Join(strings.Split(build.ImageName[:idx], "/")[1:], "/")
-		dockerImageTag = build.ImageName[idx+1:]
+		tag := build.ImageName[idx+1:]
+
+		if !strings.Contains(tag, "/") {
+			dockerRegistry = strings.Split(build.ImageName, "/")[0]
+			dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
+			dockerImageTag = "latest"
+		} else {
+			dockerRegistry = strings.Split(build.ImageName[:idx], "/")[0]
+			dockerImageName = strings.Join(strings.Split(build.ImageName[:idx], "/")[1:], "/")
+			dockerImageTag = tag
+		}
 	}
 
 	logsReader, outputbuf := io.Pipe()
