@@ -143,19 +143,16 @@ func dockerPush(build schema.Build) error {
 	idx := strings.LastIndex(build.ImageName, ":")
 
 	if idx < 0 {
-		dockerRegistry = strings.Split(build.ImageName, "/")[0]
-		dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
+		dockerRegistry, dockerImageName = splitRepositoryName(build.ImageName)
 		dockerImageTag = "latest"
 	} else {
 		tag := build.ImageName[idx+1:]
 
 		if strings.Contains(tag, "/") {
-			dockerRegistry = strings.Split(build.ImageName, "/")[0]
-			dockerImageName = strings.Join(strings.Split(build.ImageName, "/")[1:], "/")
+			dockerRegistry, dockerImageName = splitRepositoryName(build.ImageName)
 			dockerImageTag = "latest"
 		} else {
-			dockerRegistry = strings.Split(build.ImageName[:idx], "/")[0]
-			dockerImageName = strings.Join(strings.Split(build.ImageName[:idx], "/")[1:], "/")
+			dockerRegistry, dockerImageName = splitRepositoryName(build.ImageName[:idx])
 			dockerImageTag = tag
 		}
 	}
@@ -308,4 +305,21 @@ func flushLogs(logsReader io.Reader, build schema.Build) {
 	if err := scanner.Err(); err != nil {
 		printLog(build, "There was an error with the scanner in attached container")
 	}
+}
+
+func splitRepositoryName(repositoryName string) (string, string) {
+	var indexName, remoteName string
+
+	nameParts := strings.SplitN(repositoryName, "/", 2)
+
+	if len(nameParts) == 1 || (!strings.Contains(nameParts[0], ".") &&
+		!strings.Contains(nameParts[0], ":") && nameParts[0] != "localhost") {
+		indexName = "docker.io"
+		remoteName = repositoryName
+	} else {
+		indexName = nameParts[0]
+		remoteName = nameParts[1]
+	}
+
+	return indexName, remoteName
 }
