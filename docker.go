@@ -132,15 +132,30 @@ func extractCache(build schema.Build) (string, error) {
 }
 
 func dockerPush(build schema.Build) error {
+	var dockerImageName, dockerImageTag, dockerRegistry string
+
 	client, err := getDockerClient()
 
 	if err != nil {
 		return err
 	}
 
-	dockerImageName := strings.Split(build.ImageName, ":")[0]
-	dockerImageTag := strings.Split(build.ImageName, ":")[1]
-	dockerRegistry := strings.Split(build.ImageName, "/")[0]
+	idx := strings.LastIndex(build.ImageName, ":")
+
+	if idx < 0 {
+		dockerRegistry, dockerImageName = splitRepositoryName(build.ImageName)
+		dockerImageTag = "latest"
+	} else {
+		tag := build.ImageName[idx+1:]
+
+		if strings.Contains(tag, "/") {
+			dockerRegistry, dockerImageName = splitRepositoryName(build.ImageName)
+			dockerImageTag = "latest"
+		} else {
+			dockerRegistry, dockerImageName = splitRepositoryName(build.ImageName[:idx])
+			dockerImageTag = tag
+		}
+	}
 
 	logsReader, outputbuf := io.Pipe()
 	go flushLogs(logsReader, build)
@@ -290,4 +305,21 @@ func flushLogs(logsReader io.Reader, build schema.Build) {
 	if err := scanner.Err(); err != nil {
 		printLog(build, "There was an error with the scanner in attached container")
 	}
+}
+
+func splitRepositoryName(repositoryName string) (string, string) {
+	var indexName, remoteName string
+
+	nameParts := strings.SplitN(repositoryName, "/", 2)
+
+	if len(nameParts) == 1 || (!strings.Contains(nameParts[0], ".") &&
+		!strings.Contains(nameParts[0], ":") && nameParts[0] != "localhost") {
+		indexName = "docker.io"
+		remoteName = repositoryName
+	} else {
+		indexName = nameParts[0]
+		remoteName = nameParts[1]
+	}
+
+	return indexName, remoteName
 }
